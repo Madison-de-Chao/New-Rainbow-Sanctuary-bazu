@@ -1,0 +1,9 @@
+# Audio Directory
+
+This directory contains audio assets:
+- welcome.mp3 - Welcome intro audio
+- Character voice files
+- Background ambient sounds
+
+Expected files:
+- welcome.mp3 - Main welcome audio (referenced in index.html)
