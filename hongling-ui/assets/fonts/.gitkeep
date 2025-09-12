@@ -1,0 +1,8 @@
+# Fonts Directory
+
+This directory contains brand fonts:
+- 宋體 (Song/Serif fonts)
+- 黑體 (Hei/Sans-serif fonts)  
+- Garamond (Western serif font)
+
+Expected font formats: .woff2, .woff, .ttf

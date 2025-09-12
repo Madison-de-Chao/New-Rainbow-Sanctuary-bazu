@@ -1,0 +1,30 @@
+# Compressed files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tar.bz2
+
+# Node modules
+node_modules/
+
+# Build artifacts
+dist/
+build/
+
+# Temporary files
+.tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log

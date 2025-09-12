@@ -1,0 +1,39 @@
+/* 字體與色彩調性 */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC&display=swap');
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Serif TC', serif;
+  background-color: #0f0f1a;
+  color: white;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: normal;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+input, select {
+  font-family: inherit;
+  border: none;
+  border-radius: 6px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  width: 100%;
+  max-width: 300px;
+  margin-bottom: 1rem;
+}

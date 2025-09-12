@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八字系統測試案例 - 傳統查表型資料庫驗證</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff6ec4, #7873f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #ddd;
+        }
+        
+        .test-group {
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .test-group h2 {
+            color: #ff6ec4;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 110, 196, 0.3);
+            padding-bottom: 10px;
+        }
+        
+        .test-case {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #7873f5;
+        }
+        
+        .test-case h3 {
+            color: #7873f5;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .test-input {
+            background: rgba(120, 115, 245, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #7873f5;
+        }
+        
+        .test-expected {
+            background: rgba(255, 110, 196, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #ff6ec4;
+        }
+        
+        .test-verification {
+            background: rgba(255, 193, 7, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #ff6ec4, #7873f5);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 110, 196, 0.4);
+        }
+        
+        .result-area {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
+        
+        .highlight {
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .critical {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .success {
+            color: #51cf66;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 傳統八字查表型資料庫測試</h1>
+        <p class="subtitle">標準測試盤設計 - 驗證節氣分界、五虎遁、五鼠遁的精確性</p>
+        
+        <!-- 測試組1：立春前後邊界測試 -->
+        <div class="test-group">
+            <h2>1️⃣ 1976年立春前後（年柱／月柱邊界測試）</h2>
+            
+            <div class="test-case">
+                <h3>[A1] 1976年立春前一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>1976/2/5 04:59（Asia/Taipei，LST）<br>
+                    <strong>需查表：</strong>1976年立春時刻（必查資料庫A：solar_terms），須到分鐘
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong><br>
+                    • 年柱：屬前一年（1975乙卯年）<br>
+                    • 月柱：丑月（節氣分界前）
+                </div>
+                <div class="test-verification">
+                    <strong>驗證重點：</strong>若年分界沒按立春分鐘查表，這筆必定誤判
+                </div>
+                <button class="test-button" onclick="runTest('A1')">執行測試 A1</button>
+                <div id="result-A1" class="result-area"></div>
+            </div>
+            
+            <div class="test-case">
+                <h3>[A2] 1976年立春後一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>1976/2/5 05:01（Asia/Taipei，LST）<br>
+                    <strong>需查表：</strong>同上
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong><br>
+                    • 年柱：丙辰年<br>
+                    • 月柱：寅月（立春分界後）
+                </div>
+                <div class="test-verification">
+                    <strong>驗證重點：</strong>這組測資只查1/1分界一定錯，只有查節氣分界才能對
+                </div>
+                <button class="test-button" onclick="runTest('A2')">執行測試 A2</button>
+                <div id="result-A2" class="result-area"></div>
+            </div>
+        </div>
+        
+        <!-- 測試組2：節氣邊界測試 -->
+        <div class="test-group">
+            <h2>2️⃣ 2000年節氣邊界（月柱／五虎遁測試）</h2>
+            
+            <div class="test-case">
+                <h3>[B1] 2000年白露前一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2000/9/7 19:59（Asia/Taipei）<br>
+                    <strong>需查表：</strong>2000年白露時間（solar_terms，查表分界）
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong><br>
+                    • 月柱：申月<br>
+                    • 月干：查五虎遁表得月干
+                </div>
+                <div class="test-verification">
+                    <strong>驗證重點：</strong>只用公曆月份對照月支會判錯，須查分界點
+                </div>
+                <button class="test-button" onclick="runTest('B1')">執行測試 B1</button>
+                <div id="result-B1" class="result-area"></div>
+            </div>
+            
+            <div class="test-case">
+                <h3>[B2] 2000年白露後一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2000/9/7 20:01（Asia/Taipei）<br>
+                    <strong>需查表：</strong>同上
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong><br>
+                    • 月柱：酉月<br>
+                    • 月干：須依查表、年干+月支索引走五虎遁表
+                </div>
+                <div class="test-verification">
+                    <strong>驗證重點：</strong>節氣到分鐘判月分界，五虎遁月干須查表
+                </div>
+                <button class="test-button" onclick="runTest('B2')">執行測試 B2</button>
+                <div id="result-B2" class="result-area"></div>
+            </div>
+        </div>
+        
+        <!-- 測試組3：寒露邊界測試 -->
+        <div class="test-group">
+            <h2>3️⃣ 2015年寒露邊界（月柱／五虎遁再驗證）</h2>
+            
+            <div class="test-case">
+                <h3>[C1] 2015年寒露前一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2015/10/8 08:59（Asia/Taipei）<br>
+                    <strong>需查表：</strong>2015年寒露時刻（solar_terms）
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong>月柱應為酉月，五虎遁月干查表
+                </div>
+                <button class="test-button" onclick="runTest('C1')">執行測試 C1</button>
+                <div id="result-C1" class="result-area"></div>
+            </div>
+            
+            <div class="test-case">
+                <h3>[C2] 2015年寒露後一分鐘</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2015/10/8 09:01（Asia/Taipei）<br>
+                    <strong>需查表：</strong>同上
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong>月柱切換到戌月，月干依規則查五虎遁
+                </div>
+                <button class="test-button" onclick="runTest('C2')">執行測試 C2</button>
+                <div id="result-C2" class="result-area"></div>
+            </div>
+        </div>
+        
+        <!-- 測試組4：子時跨日測試 -->
+        <div class="test-group">
+            <h2>4️⃣ 2020年子時跨日（日柱／時柱邊界）</h2>
+            
+            <div class="test-case">
+                <h3>[D1] 2020/4/20 23:30（子時前半）</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2020/4/20 23:30（Asia/Taipei，LST）<br>
+                    <strong>需查表：</strong>子時定義（23:00–00:59），查表跨日，日柱/時柱計算需自動+1天
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong><br>
+                    • 日柱：應以2020/4/21為基準<br>
+                    • 時柱：子時（再查五鼠遁表得時干）
+                </div>
+                <button class="test-button" onclick="runTest('D1')">執行測試 D1</button>
+                <div id="result-D1" class="result-area"></div>
+            </div>
+            
+            <div class="test-case">
+                <h3>[D2] 2020/4/21 00:30（子時後半）</h3>
+                <div class="test-input">
+                    <strong>輸入：</strong>2020/4/21 00:30（Asia/Taipei，LST）
+                </div>
+                <div class="test-expected">
+                    <strong>預期結果：</strong>與上一筆日柱相同，時柱同為子時
+                </div>
+                <button class="test-button" onclick="runTest('D2')">執行測試 D2</button>
+                <div id="result-D2" class="result-area"></div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <button class="test-button" onclick="runAllTests()" style="font-size: 1.2rem; padding: 15px 30px;">
+                🚀 執行全部測試
+            </button>
+            <button class="test-button" onclick="exportResults()" style="font-size: 1.2rem; padding: 15px 30px;">
+                📊 匯出測試報告
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 測試案例數據
+        const testCases = {
+            'A1': {
+                datetime: '1976-02-05T04:59:00',
+                description: '1976年立春前一分鐘',
+                expected: {
+                    year: '乙卯',
+                    month: '丑月',
+                    critical: '年分界按立春分鐘查表'
+                }
+            },
+            'A2': {
+                datetime: '1976-02-05T05:01:00',
+                description: '1976年立春後一分鐘',
+                expected: {
+                    year: '丙辰',
+                    month: '寅月',
+                    critical: '節氣分界判斷'
+                }
+            },
+            'B1': {
+                datetime: '2000-09-07T19:59:00',
+                description: '2000年白露前一分鐘',
+                expected: {
+                    month: '申月',
+                    critical: '節氣分界到分鐘'
+                }
+            },
+            'B2': {
+                datetime: '2000-09-07T20:01:00',
+                description: '2000年白露後一分鐘',
+                expected: {
+                    month: '酉月',
+                    critical: '五虎遁月干查表'
+                }
+            },
+            'C1': {
+                datetime: '2015-10-08T08:59:00',
+                description: '2015年寒露前一分鐘',
+                expected: {
+                    month: '酉月',
+                    critical: '寒露分界驗證'
+                }
+            },
+            'C2': {
+                datetime: '2015-10-08T09:01:00',
+                description: '2015年寒露後一分鐘',
+                expected: {
+                    month: '戌月',
+                    critical: '月柱切換驗證'
+                }
+            },
+            'D1': {
+                datetime: '2020-04-20T23:30:00',
+                description: '2020年子時前半跨日',
+                expected: {
+                    day: '以4/21為基準',
+                    hour: '子時',
+                    critical: '子時跨日邏輯'
+                }
+            },
+            'D2': {
+                datetime: '2020-04-21T00:30:00',
+                description: '2020年子時後半',
+                expected: {
+                    day: '與D1相同日柱',
+                    hour: '子時',
+                    critical: '子時一致性'
+                }
+            }
+        };
+
+        // 執行單個測試
+        async function runTest(testId) {
+            const resultDiv = document.getElementById(`result-${testId}`);
+            const testCase = testCases[testId];
+            
+            resultDiv.innerHTML = `正在測試 ${testCase.description}...\n`;
+            
+            try {
+                const response = await fetch('https://rainbow-sanctuary-bazu-production.up.railway.app/api/bazi/compute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        datetime_local: testCase.datetime,
+                        timezone: 'Asia/Taipei',
+                        longitude: 120.0,
+                        use_true_solar_time: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const pillars = data.data.four_pillars;
+                    const log = data.data.calculation_log;
+                    
+                    let result = `✅ 測試 ${testId} 完成\n`;
+                    result += `📅 輸入時間: ${testCase.datetime}\n`;
+                    result += `📊 計算結果:\n`;
+                    result += `   年柱: ${pillars.year.stem}${pillars.year.branch}\n`;
+                    result += `   月柱: ${pillars.month.stem}${pillars.month.branch}\n`;
+                    result += `   日柱: ${pillars.day.stem}${pillars.day.branch}\n`;
+                    result += `   時柱: ${pillars.hour.stem}${pillars.hour.branch}\n`;
+                    result += `\n🔍 計算日誌:\n`;
+                    result += `   月份變化: ${log.month_change || 'N/A'}\n`;
+                    result += `   五虎遁: ${log.five_tiger_index || 'N/A'}\n`;
+                    result += `   五鼠遁: ${log.five_rat_index || 'N/A'}\n`;
+                    result += `   節氣命中: ${log.solar_term_hit || 'N/A'}\n`;
+                    
+                    // 驗證結果
+                    result += `\n🎯 驗證結果:\n`;
+                    if (testCase.expected.year) {
+                        const yearMatch = `${pillars.year.stem}${pillars.year.branch}` === testCase.expected.year;
+                        result += `   年柱: ${yearMatch ? '✅' : '❌'} 預期 ${testCase.expected.year}, 實際 ${pillars.year.stem}${pillars.year.branch}\n`;
+                    }
+                    if (testCase.expected.month) {
+                        const monthBranch = pillars.month.branch;
+                        const expectedBranch = testCase.expected.month.replace('月', '');
+                        const monthMatch = monthBranch === expectedBranch;
+                        result += `   月柱: ${monthMatch ? '✅' : '❌'} 預期 ${testCase.expected.month}, 實際 ${pillars.month.stem}${monthBranch}\n`;
+                    }
+                    
+                    result += `\n⚠️  關鍵驗證點: ${testCase.expected.critical}`;
+                    
+                    resultDiv.innerHTML = result;
+                } else {
+                    resultDiv.innerHTML = `❌ 測試失敗: ${data.message || '未知錯誤'}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ 網路錯誤: ${error.message}`;
+            }
+        }
+
+        // 執行全部測試
+        async function runAllTests() {
+            for (const testId of Object.keys(testCases)) {
+                await runTest(testId);
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 延遲1秒避免API限制
+            }
+        }
+
+        // 匯出測試報告
+        function exportResults() {
+            let report = '# 八字系統測試報告\n\n';
+            report += `測試時間: ${new Date().toLocaleString()}\n\n`;
+            
+            for (const testId of Object.keys(testCases)) {
+                const resultDiv = document.getElementById(`result-${testId}`);
+                report += `## 測試 ${testId}: ${testCases[testId].description}\n`;
+                report += '```\n';
+                report += resultDiv.textContent || '未執行';
+                report += '\n```\n\n';
+            }
+            
+            const blob = new Blob([report], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `八字系統測試報告_${new Date().toISOString().slice(0, 10)}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
+

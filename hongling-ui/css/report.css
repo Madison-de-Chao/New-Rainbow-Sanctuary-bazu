@@ -1,0 +1,81 @@
+.report-wrapper {
+  padding: 2rem;
+  background: linear-gradient(to bottom, #1a1a2e, #0f0f1a);
+  color: white;
+  font-family: 'Noto Serif TC', serif;
+  min-height: 100vh;
+}.report-body.healing-style {
+  background: #f0fdf4;
+  color: #2c3e50;
+  font-family: "Noto Serif TC", serif;
+}
+
+.report-body.military-style {
+  background: #f9f9f9;
+  border-left: 4px solid #2c3e50;
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+.report-body.mythic-style {
+  background: #f5f0ff;
+  font-family: "Cinzel", serif;
+  color: #4b0082;
+}
+
+.report-body.savage-style {
+  background: #fff0f0;
+  color: #8b0000;
+  font-weight: bold;
+  font-family: "Impact", sans-serif;
+}
+
+.report-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.report-title {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #ff6ec4, #7873f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.report-tone {
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.report-body {
+  margin-top: 2rem;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.report-buttons {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.report-buttons button {
+  background: linear-gradient(to right, #ff6ec4, #7873f5);
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255,255,255,0.2);
+  transition: transform 0.3s ease;
+}
+
+.report-buttons button:hover {
+  transform: scale(1.05);
+}

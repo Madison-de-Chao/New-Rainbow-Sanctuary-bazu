@@ -1,0 +1,61 @@
+/* 顏色與能量場切換樣式 */
+
+/* 主題色調 */
+:root {
+  --primary-gradient: linear-gradient(to right, #ff6ec4, #7873f5);
+  --secondary-gradient: linear-gradient(to bottom, #1a1a2e, #0f0f1a);
+  --accent-color: #ff6ec4;
+  --text-light: #ccc;
+  --text-lighter: #aaa;
+  --bg-dark: #0f0f1a;
+  --bg-darker: #1a1a2e;
+}
+
+/* 能量場主題切換 */
+.theme-fire {
+  --primary-gradient: linear-gradient(to right, #ff4757, #ff3742);
+  --accent-color: #ff4757;
+}
+
+.theme-water {
+  --primary-gradient: linear-gradient(to right, #70a1ff, #5352ed);
+  --accent-color: #70a1ff;
+}
+
+.theme-earth {
+  --primary-gradient: linear-gradient(to right, #f0932b, #eb4d4b);
+  --accent-color: #f0932b;
+}
+
+.theme-metal {
+  --primary-gradient: linear-gradient(to right, #ddd, #aaa);
+  --accent-color: #ddd;
+}
+
+.theme-wood {
+  --primary-gradient: linear-gradient(to right, #6ab04c, #218c74);
+  --accent-color: #6ab04c;
+}
+
+/* 動態背景效果 */
+.energy-field {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  background: radial-gradient(circle at center, rgba(255,110,196,0.1) 0%, transparent 70%);
+  animation: energyPulse 4s ease-in-out infinite;
+}
+
+@keyframes energyPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+/* 五行切換動畫 */
+.element-transition {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
