@@ -49,10 +49,10 @@
 ## 專案結構
 
 ```
-hongling-ui/
 ├── index.html              # 首頁動畫（入口儀式）
 ├── bazi.html               # 八字輸入與軍團召喚頁
 ├── report.html             # 命盤報告展示頁
+├── test-cases.html         # 測試案例頁面
 │
 ├── css/                    # 樣式表資料夾
 │   ├── style.css           # 全站主樣式
@@ -64,7 +64,10 @@ hongling-ui/
 ├── js/                     # JavaScript 控制邏輯
 │   ├── animation.js        # 首頁動畫與粒子效果控制
 │   ├── app.js              # 八字邏輯與 API 串接
-│   └── report.js           # 報告頁渲染與多風格生成
+│   ├── report.js           # 報告頁渲染與多風格生成
+│   ├── api.js              # API 接口相關功能
+│   ├── enhanced-app.js     # 增強版應用邏輯
+│   └── 其他輔助模組...      # 敘事生成、計算器等
 │
 ├── assets/                 # 靜態資源資料夾
 │   ├── logo/               # Maison de Chao × Rainbow Sanctuary 品牌圖騰
@@ -88,8 +91,8 @@ hongling-ui/
 
 1. **克隆專案**
    ```bash
-   git clone https://github.com/Madison-de-Chao/hongling-ui.git
-   cd hongling-ui
+   git clone https://github.com/Madison-de-Chao/New-Rainbow-Sanctuary-bazu.git
+   cd New-Rainbow-Sanctuary-bazu
    ```
 
 2. **啟動本地伺服器**
@@ -203,7 +206,7 @@ POST /report
 
 - **專案作者**: Madison de Chao
 - **機構**: Maison de Chao × Rainbow Sanctuary
-- **專案網址**: https://github.com/Madison-de-Chao/hongling-ui
+- **專案網址**: https://github.com/Madison-de-Chao/New-Rainbow-Sanctuary-bazu
 
 ---
 
