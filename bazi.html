@@ -13,34 +13,21 @@
 </head>
 <body>
   <div class="bazi-container">
-    <section class="form-section">
-      <h2>輸入你的出生資料</h2>
-      <form id="bazi-form">
-        <div class="form-row">
-          <input type="text" name="user-name" placeholder="姓名或暱稱（選填）" maxlength="20" />
-          <select name="gender">
-            <option value="">性別</option>
-            <option value="male">男</option>
-            <option value="female">女</option>
-          </select>
-        </div>
-        <div class="form-row">
-          <input type="number" name="yyyy" placeholder="西元年" required />
-          <input type="number" name="mm" placeholder="月" required />
-          <input type="number" name="dd" placeholder="日" required />
-          <input type="number" name="hh" placeholder="時（0–23）" required />
-        </div>
-        <select name="zMode">
-          <option value="none">不換日</option>
-          <option value="late">子時後換日</option>
-          <option value="full">全子時換日</option>
-        </select>
-        <button type="submit">生成命盤</button>
-      </form>
+    <!-- 載入中顯示 -->
+    <section class="loading-section" id="loading">
+      <h2>正在召喚你的四時軍團...</h2>
+      <div class="loading-animation">
+        <div class="star-particles"></div>
+        <p>解析命盤中，請稍候</p>
+      </div>
     </section>
 
+    <!-- 結果顯示區域 -->
     <section class="result-section" id="result" style="display: none;">
-      <h2>你的四時軍團已召喚</h2>
+      <div class="result-header">
+        <h2 id="user-greeting">你的四時軍團已召喚</h2>
+        <button onclick="goBack()" class="back-btn">重新輸入</button>
+      </div>
       <div id="pillars"></div>
       <div id="narrative"></div>
       <div id="shensha-info"></div>
