@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <script src="js/api.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>虹靈御所 · Rainbow Sanctuary</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+</head>
+<body>
+  <canvas id="particles-bg"></canvas>
+
+  <div class="intro-content">
+    <section class="logo-section">
+      <img src="assets/logo/maison.png" class="logo maison" alt="Maison de Chao" />
+      <span class="x-symbol">×</span>
+      <img src="assets/logo/rainbow.png" class="logo rainbow" alt="Rainbow Sanctuary" />
+    </section>
+
+    <section class="text-section">
+      <h1 class="brand-title">Maison de Chao × Rainbow Sanctuary</h1>
+      <p id="typed-slogan" class="brand-slogan"></p>
+      <p class="brand-sub">靈魂的骨架 × 情感的光譜</p>
+    </section>
+
+    <section class="tone-selector">
+      <label>選擇你的敘事語氣：</label>
+      <select id="tone">
+        <option value="default">預設</option>
+        <option value="military">軍事</option>
+        <option value="healing">療癒</option>
+        <option value="poetic">詩意</option>
+        <option value="mythic">神話</option>
+      </select>
+    </section>
+<section class="birth-form">
+  <label>請輸入你的出生資料：</label>
+  <div class="name-field">
+    <input type="text" id="user-name" placeholder="姓名或暱稱（選填）" maxlength="20" />
+    <select id="gender">
+      <option value="">性別</option>
+      <option value="male">男</option>
+      <option value="female">女</option>
+    </select>
+  </div>
+  <div class="birth-fields">
+    <select id="birth-year">
+      <option value="">年</option>
+      <!-- 可用 JS 動態生成 1900～2025 -->
+    </select>
+    <select id="birth-month">
+      <option value="">月</option>
+      <!-- 1～12 -->
+    </select>
+    <select id="birth-day">
+      <option value="">日</option>
+      <!-- 1～31 -->
+    </select>
+    <select id="birth-hour">
+      <option value="">時辰</option>
+      <option value="0">子時（23:00-01:00）</option>
+      <option value="2">丑時（01:00-03:00）</option>
+      <option value="4">寅時（03:00-05:00）</option>
+      <option value="6">卯時（05:00-07:00）</option>
+      <option value="8">辰時（07:00-09:00）</option>
+      <option value="10">巳時（09:00-11:00）</option>
+      <option value="12">午時（11:00-13:00）</option>
+      <option value="14">未時（13:00-15:00）</option>
+      <option value="16">申時（15:00-17:00）</option>
+      <option value="18">酉時（17:00-19:00）</option>
+      <option value="20">戌時（19:00-21:00）</option>
+      <option value="22">亥時（21:00-23:00）</option>
+    </select>
+  </div>
+</section>
+    <button class="enter-btn" onclick="enterSite()">開始召喚你的軍團</button>
+  </div>
+
+  <audio id="welcome-audio" src="assets/audio/welcome.mp3" autoplay></audio>
+  <script src="js/animation.js"></script>
+</body>
+</html>
