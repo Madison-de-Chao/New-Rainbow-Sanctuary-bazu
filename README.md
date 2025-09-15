@@ -78,6 +78,16 @@
 ├── data/                   # 資料結構與範例
 │   └── sample.json         # 八字數據結構範例與敘事設定
 │
+├── docs/                   # 專案文件
+│   └── BRANCH_PROTECTION.md # 分支保護設定指南
+│
+├── .github/                # GitHub 設定
+│   └── workflows/          # CI/CD 工作流程
+│       ├── branch-protection.yml    # 分支保護檢查
+│       ├── pr-validation.yml       # Pull Request 驗證
+│       ├── application-tests.yml   # 應用程式測試
+│       └── deployment-check.yml    # 部署準備檢查
+│
 └── README.md               # 專案說明文件
 ```
 
@@ -191,12 +201,24 @@ POST /report
 3. 提交變更 (`git commit -m 'Add amazing feature'`)
 4. 推送分支 (`git push origin feature/amazing-feature`)
 5. 開啟 Pull Request
+6. 等待自動化檢查通過
+7. 請求程式碼審查
+8. 合併至主分支
 
 ### 程式碼規範
 - 使用一致的縮排（2個空格）
 - 中文註解與變數命名
 - 保持函數簡潔單一職責
 - 遵循現有的程式碼風格
+
+### 分支保護
+本專案啟用嚴格的分支保護機制：
+- 🔒 **禁止強制推送** - 防止 `git push --force` 覆蓋歷史
+- 🔒 **禁止刪除主分支** - 保護 `main`/`master` 分支不被意外刪除
+- ✅ **必須通過狀態檢查** - 所有 CI/CD 檢查必須通過才能合併
+- 👥 **需要程式碼審查** - 至少一位審查者批准才能合併
+
+詳細設定說明請參考：[分支保護設定指南](docs/BRANCH_PROTECTION.md)
 
 ## 授權條款
 

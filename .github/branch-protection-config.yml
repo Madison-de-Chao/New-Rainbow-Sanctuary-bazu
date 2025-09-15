@@ -1,0 +1,75 @@
+# Branch Protection Configuration
+# This file defines the settings for branch protection workflows
+
+# Required files that must exist in the repository
+required_files:
+  - "index.html"
+  - "bazi.html"
+  - "report.html"
+  - "README.md"
+  - "css/style.css"
+  - "js/app.js"
+  - "data/sample.json"
+
+# Required sections in README.md
+required_readme_sections:
+  - "專案簡介"
+  - "主要功能"
+  - "技術架構"
+  - "專案結構"
+  - "安裝與使用"
+  - "貢獻指南"
+
+# File patterns to check for security issues
+sensitive_file_patterns:
+  - "*.env"
+  - "*.key"
+  - "*.pem"
+  - "*password*"
+  - "*secret*"
+  - ".env.*"
+
+# Maximum file size for warnings (in bytes)
+max_file_size: 10485760  # 10MB
+
+# File extensions to validate
+validation:
+  html:
+    - "*.html"
+  javascript:
+    - "*.js"
+  css:
+    - "*.css"
+  json:
+    - "*.json"
+
+# Performance thresholds
+performance:
+  max_http_requests: 50
+  max_image_size: 500000  # 500KB
+
+# Browser compatibility checks
+compatibility:
+  check_vendor_prefixes: true
+  check_modern_features: true
+  warn_ie_incompatibility: true
+
+# SEO requirements
+seo:
+  require_title: true
+  require_meta_description: true
+  require_viewport: true
+  require_charset: true
+
+# Pull Request validation
+pull_request:
+  min_commit_message_length: 10
+  check_conventional_commits: true
+  warn_critical_file_changes: true
+  
+# Critical files that trigger warnings when modified
+critical_files:
+  - "README.md"
+  - "index.html"
+  - "package.json"
+  - ".gitignore"
