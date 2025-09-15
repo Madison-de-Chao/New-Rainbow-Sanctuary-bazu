@@ -37,9 +37,9 @@ let rendering = false;
 
 // D. 安全的localStorage包裝
 const storage = (() => {
-  try { 
-    return window.localStorage; 
-  } catch { 
+  try {
+    return window.localStorage;
+  } catch {
     const mem = {};
     return {
       getItem: k => mem[k] ?? null,
@@ -51,10 +51,10 @@ const storage = (() => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Enhanced app loaded, checking localStorage...");
-  
+
   const baziAnalysis = storage.getItem("baziAnalysis");
   const tone = storage.getItem("tone") || "default";
-  
+
   // 檢查是否有保存的表單數據
   const savedFormData = storage.getItem("birthData");
   if (savedFormData) {
@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const monthInput = document.querySelector('input[name="mm"]');
       const dayInput = document.querySelector('input[name="dd"]');
       const hourInput = document.querySelector('input[name="hh"]');
-      
+
       if (yearInput) yearInput.value = formData.year;
       if (monthInput) monthInput.value = formData.month;
       if (dayInput) dayInput.value = formData.day;
@@ -74,12 +74,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error loading saved form data:", error);
     }
   }
-  
+
   if (baziAnalysis) {
     try {
       const data = JSON.parse(baziAnalysis);
       console.log("Found cached data:", data);
-      
+
       if (data.chart && data.narrative) {
         await renderEnhancedResultsOnce(data);
       } else {
@@ -101,14 +101,14 @@ async function generateFreshData() {
     day: 6,
     hour: 20
   };
-  
+
   const tone = storage.getItem("tone") || "default";
-  
+
   try {
     console.log("Calling API with data:", birthData);
     const result = await getFullBaziAnalysis(birthData, tone);
     console.log("API returned:", result);
-    
+
     storage.setItem("baziAnalysis", JSON.stringify(result));
     await renderEnhancedResultsOnce(result);
   } catch (error) {
@@ -124,23 +124,23 @@ async function renderEnhancedResultsOnce(data) {
     console.log("Already rendering, skipping...");
     return;
   }
-  
+
   rendering = true;
   try {
     console.log("Rendering enhanced results...");
-    
+
     // 渲染四柱卡片 - 添加飛入動畫
     await renderAnimatedPillars(data.chart.pillars);
-    
+
     // 渲染五行圖表 - 使用安全的Chart.js渲染
     await renderSafeFiveElementsChart(data.chart.fiveElements);
-    
+
     // 渲染敘事內容 - 添加打字機效果
     await renderAnimatedNarrative(data.narrative);
-    
+
     // 渲染陰陽統計
     renderYinYang(data.chart.yinYang);
-    
+
     // 添加神煞信息（如果有）
     if (data.spirits && data.spirits.length > 0) {
       renderSpirits(data.spirits);
@@ -156,15 +156,15 @@ async function renderEnhancedResultsOnce(data) {
 async function renderAnimatedPillars(pillars) {
   const pillarsElement = ensureElement("#pillars", "pillars");
   pillarsElement.innerHTML = "";
-  
+
   const pillarNames = ["年", "月", "日", "時"];
   const colors = ["#ff6ec4", "#7873f5", "#00d4ff", "#ff9500"];
-  
+
   for (let i = 0; i < pillarNames.length; i++) {
     const pillarName = pillarNames[i];
     const pillar = pillars[pillarName];
     if (!pillar) continue;
-    
+
     const card = document.createElement("div");
     card.className = "pillar-card";
     card.style.cssText = `
@@ -180,7 +180,7 @@ async function renderAnimatedPillars(pillars) {
       backdrop-filter: blur(10px);
       margin-bottom: 1rem;
     `;
-    
+
     card.innerHTML = `
       <div style="font-size: 1.2rem; color: ${colors[i]}; font-weight: bold; margin-bottom: 0.5rem;">
         ${pillarName}柱軍團
@@ -192,15 +192,15 @@ async function renderAnimatedPillars(pillars) {
         天干：${pillar.gan} | 地支：${pillar.zhi}
       </div>
     `;
-    
+
     pillarsElement.appendChild(card);
-    
+
     // 延遲動畫以創建飛入效果
     setTimeout(() => {
       card.style.transform = "translateY(0) scale(1)";
       card.style.opacity = "1";
     }, i * 200);
-    
+
     await new Promise(resolve => setTimeout(resolve, 200));
   }
 }
@@ -211,7 +211,7 @@ async function renderSafeFiveElementsChart(fiveElements) {
     console.warn("Chart.js not loaded");
     return;
   }
-  
+
   const config = {
     type: "radar",
     data: {
@@ -264,7 +264,7 @@ async function renderSafeFiveElementsChart(fiveElements) {
       }
     }
   };
-  
+
   // 使用安全的Chart.js渲染函數
   const chart = renderAnimatedChart("fiveChart", config);
   if (chart) {
@@ -276,15 +276,15 @@ async function renderSafeFiveElementsChart(fiveElements) {
 async function renderAnimatedNarrative(narrative) {
   const narrativeElement = ensureElement("#narrative", "narrative");
   narrativeElement.innerHTML = "";
-  
+
   const pillarNames = ["年", "月", "日", "時"];
   const colors = ["#ff6ec4", "#7873f5", "#00d4ff", "#ff9500"];
-  
+
   for (let i = 0; i < pillarNames.length; i++) {
     const pillarName = pillarNames[i];
     const pillarNarrative = narrative[pillarName];
     if (!pillarNarrative) continue;
-    
+
     const card = document.createElement("div");
     card.className = "narrative-card";
     card.style.cssText = `
@@ -299,7 +299,7 @@ async function renderAnimatedNarrative(narrative) {
       transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 8px 32px ${colors[i]}10;
     `;
-    
+
     card.innerHTML = `
       <h3 style="color: ${colors[i]}; margin-bottom: 1rem; font-size: 1.5rem;">
         ${pillarName}柱 · ${pillarNarrative.title}
@@ -312,15 +312,15 @@ async function renderAnimatedNarrative(narrative) {
         ${pillarNarrative.description}
       </p>
     `;
-    
+
     narrativeElement.appendChild(card);
-    
+
     // 延遲動畫
     setTimeout(() => {
       card.style.transform = "translateX(0)";
       card.style.opacity = "1";
     }, i * 300);
-    
+
     await new Promise(resolve => setTimeout(resolve, 300));
   }
 }
@@ -328,7 +328,7 @@ async function renderAnimatedNarrative(narrative) {
 // 安全的陰陽統計渲染
 function renderYinYang(yinYang) {
   const yinYangElement = ensureElement("#yinyang", "yinyang");
-  
+
   yinYangElement.innerHTML = `
     <div style="display: flex; justify-content: center; gap: 2rem; align-items: center;">
       <div style="text-align: center;">
@@ -346,7 +346,7 @@ function renderYinYang(yinYang) {
 // 安全的神煞信息渲染
 function renderSpirits(spirits) {
   const narrativeElement = ensureElement("#narrative", "narrative");
-  
+
   const spiritsCard = document.createElement("div");
   spiritsCard.className = "spirits-card";
   spiritsCard.style.cssText = `
@@ -357,14 +357,14 @@ function renderSpirits(spirits) {
     margin-top: 2rem;
     backdrop-filter: blur(10px);
   `;
-  
+
   spiritsCard.innerHTML = `
     <h3 style="color: #ffd700; margin-bottom: 1rem; font-size: 1.5rem;">神煞信息</h3>
     <div style="color: #ccc; line-height: 1.6;">
       ${spirits.map(spirit => `<div style="margin-bottom: 0.5rem;">• ${spirit}</div>`).join('')}
     </div>
   `;
-  
+
   narrativeElement.appendChild(spiritsCard);
 }
 
@@ -374,7 +374,7 @@ function showLoadingAnimation() {
   if (document.getElementById("loading-animation")) {
     return;
   }
-  
+
   const loadingDiv = document.createElement("div");
   loadingDiv.id = "loading-animation";
   loadingDiv.style.cssText = `
@@ -390,16 +390,16 @@ function showLoadingAnimation() {
     z-index: 9999;
     backdrop-filter: blur(10px);
   `;
-  
+
   loadingDiv.innerHTML = `
     <div style="text-align: center;">
       <div style="width: 60px; height: 60px; border: 4px solid rgba(255, 110, 196, 0.3); border-top: 4px solid #ff6ec4; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
       <div style="color: #ff6ec4; font-size: 1.2rem;">召喚你的軍團中...</div>
     </div>
   `;
-  
+
   document.body.appendChild(loadingDiv);
-  
+
   // 添加旋轉動畫（避免重複添加）
   if (!document.getElementById("loading-animation-style")) {
     const style = document.createElement("style");
@@ -433,7 +433,7 @@ function hideLoadingAnimation() {
 document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   showLoadingAnimation();
-  
+
   const form = new FormData(e.target);
   const input = {
     year: parseInt(form.get("yyyy")),
@@ -441,12 +441,12 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
     day: parseInt(form.get("dd")),
     hour: parseInt(form.get("hh"))
   };
-  
+
   // 保存表單數據到localStorage
   storage.setItem("birthData", JSON.stringify(input));
-  
+
   const tone = storage.getItem("tone") || "default";
-  
+
   try {
     const analysisData = await getFullBaziAnalysis(input, tone);
     storage.setItem("baziAnalysis", JSON.stringify(analysisData));
@@ -456,11 +456,10 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
     const demoData = getDemoAnalysis(input, tone);
     await renderEnhancedResultsOnce(demoData);
   }
-  
+
   hideLoadingAnimation();
 });
 
 function exportReport() {
   window.location.href = "report.html";
 }
-

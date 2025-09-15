@@ -210,12 +210,12 @@ button[onclick="exportReport()"]:hover {
 }
 
 @keyframes fadeIn {
-  from { 
-    opacity: 0; 
+  from {
+    opacity: 0;
     transform: translateY(20px);
   }
-  to { 
-    opacity: 1; 
+  to {
+    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -225,20 +225,20 @@ button[onclick="exportReport()"]:hover {
   .bazi-container {
     padding: 1rem;
   }
-  
+
   .form-section {
     padding: 1.5rem;
     margin-bottom: 2rem;
   }
-  
+
   .form-section form {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   #pillars {
     grid-template-columns: 1fr;
   }
-  
+
   canvas#fiveChart {
     max-width: 100%;
   }
@@ -383,7 +383,7 @@ canvas#fiveChart {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 80%, rgba(255, 110, 196, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(120, 115, 245, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
@@ -428,12 +428,12 @@ canvas#fiveChart {
   .pillar-card {
     margin-bottom: 1rem;
   }
-  
+
   .narrative-card {
     padding: 1.5rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .result-section h2 {
     font-size: 1.5rem;
   }
