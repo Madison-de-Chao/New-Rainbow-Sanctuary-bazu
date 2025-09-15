@@ -1,5 +1,5 @@
 // AI故事生成器
-window.AIStoryGenerator ??= class AIStoryGenerator {
+class AIStoryGenerator {
   constructor() {
     this.apiKey = null; // 需要設置API密鑰
     this.baseUrl = 'https://api.openai.com/v1/chat/completions';
