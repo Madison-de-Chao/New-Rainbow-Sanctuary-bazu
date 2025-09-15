@@ -29,7 +29,7 @@ function generateStoryPrompt(pillarKey, pillarData, userData = {}) {
   const commanderTitle = GAN_ROLE[stem] || stem;
   const strategistTitle = ZHI_ROLE[branch] || branch;
   const tenGodDesc = TEN_GOD_NARRATIVE[tenGod] || tenGod;
-  const shenshaDesc = shensha.map(s => window.SHENSHA_EFFECTS?.[s] || s).join('、');
+  const shenshaDesc = shensha.map(s => (window.SHENSHA_EFFECTS && window.SHENSHA_EFFECTS[s]) || s).join('、');
   
   const pillarDomains = {
     "年": "家族脈絡與社會舞台",
