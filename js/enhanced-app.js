@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  // Check for cached analysis data
+  // Load existing analysis data from storage
   const baziAnalysis = storage.getItem("baziAnalysis");
   if (baziAnalysis) {
     try {
