@@ -221,7 +221,7 @@ button[onclick="exportReport()"]:hover {
 }
 
 /* 響應式設計 */
-@media (max-width: 768px) {
+@media (max-width: 768px) 
   .bazi-container {
     padding: 1rem;
   }
@@ -242,7 +242,7 @@ button[onclick="exportReport()"]:hover {
   canvas#fiveChart {
     max-width: 100%;
   }
-}
+
 
 
 /* 增強版美化效果 */
@@ -280,7 +280,7 @@ button[onclick="exportReport()"]:hover {
     transform: translateX(100%) translateY(100%) rotate(45deg);
     opacity: 0;
   }
-}
+
 
 .narrative-card {
   position: relative;
@@ -312,7 +312,7 @@ button[onclick="exportReport()"]:hover {
     transform: scale(1.02);
     box-shadow: 0 0 0 10px rgba(255, 110, 196, 0);
   }
-}
+ }
 
 .pillar-card:hover {
   animation: pulse 2s infinite;
@@ -326,7 +326,7 @@ button[onclick="exportReport()"]:hover {
   50% {
     text-shadow: 0 0 20px rgba(255, 110, 196, 0.8), 0 0 30px rgba(255, 110, 196, 0.6);
   }
-}
+ }
 
 /* 浮動動畫 */
 @keyframes float {
@@ -336,7 +336,7 @@ button[onclick="exportReport()"]:hover {
   50% {
     transform: translateY(-10px);
   }
-}
+
 
 canvas#fiveChart {
   animation: float 6s ease-in-out infinite;
@@ -356,7 +356,7 @@ canvas#fiveChart {
   75% {
     border-image: linear-gradient(45deg, #ff9500, #ff6ec4, #7873f5, #00d4ff) 1;
   }
-}
+
 
 .result-section h2 {
   background: linear-gradient(45deg, #ff6ec4, #7873f5, #00d4ff, #ff9500);
@@ -373,7 +373,7 @@ canvas#fiveChart {
   50% {
     background-position: 100% 50%;
   }
-}
+
 
 /* 粒子背景效果 */
 .bazi-container::before {
@@ -737,12 +737,7 @@ canvas#fiveChart {
   66% {
     transform: translateX(-20px) translateY(20px);
   }
-}
-  }
-  66% {
-    transform: translateX(-20px) translateY(20px);
-  }
-}
+
 
 /* 滾動條美化 */
 ::-webkit-scrollbar {
@@ -777,7 +772,7 @@ canvas#fiveChart {
   .result-section h2 {
     font-size: 1.5rem;
   }
-}
+
 
 /* 載入動畫增強 */
 @keyframes fadeInUp {
@@ -789,7 +784,7 @@ canvas#fiveChart {
     opacity: 1;
     transform: translateY(0);
   }
-}
+
 
 .card {
   animation: fadeInUp 0.6s ease-out forwards;
