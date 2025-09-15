@@ -32,8 +32,8 @@ function renderAnimatedChart(canvasId, config) {
   return new Chart(ctx, config);
 }
 
-// C. 防止重複渲染的狀態管理
-let rendering = false;
+// C. 防止重複渲染的狀態管理 - 使用全域變數避免重複宣告
+window.rendering = window.rendering || false;
 
 // D. 安全的localStorage包裝
 const storage = (() => {
@@ -49,7 +49,16 @@ const storage = (() => {
   }
 })();
 
-document.addEventListener("DOMContentLoaded", async () => {
+// Enhanced App - Initialization Function
+window.initializeEnhancedApp = function() {
+  console.log("Initializing Enhanced App...");
+  
+  // Main initialization logic here
+  processStoredData();
+};
+
+// Process stored data and initialize UI
+async function processStoredData() {
   console.log("Enhanced app loaded");
 
   // 綁定表單提交事件
@@ -242,7 +251,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   }
-});
+};
 
 // 生成豐富故事內容的演示數據
 function getRichDemoAnalysis(birthData, tone = "default") {

@@ -26,20 +26,18 @@
         <h2 id="user-greeting">你的四時軍團已召喚</h2>
         <button onclick="goBack()" class="back-btn">重新輸入</button>
       </div>
-      <div id="pillars"></div>
-      <div id="narrative"></div>
-      <div id="shensha-info"></div>
-      <canvas id="fiveChart" width="300" height="300"></canvas>
-      <div id="yinYang"></div>
+      <div id="result-container">
+        <div id="pillars"></div>
+        <div id="narrative"></div>
+        <div id="shensha-info"></div>
+        <canvas id="fiveChart" width="300" height="300"></canvas>
+        <div id="yinYang"></div>
+      </div>
       <button onclick="exportReport()">匯出報告</button>
     </section>
   </div>
 
-  <script src="js/api.js"></script>
-  <script src="js/ai-story-generator.js"></script>
-  <script src="js/ai-narrative.js"></script>
-  <script src="js/shensha-calculator.js"></script>
-  <script src="js/traditional-bazi-renderer.js"></script>
-  <script src="js/enhanced-app.js"></script>
+  <!-- Single entry point module with gradual migration approach -->
+  <script type="module" src="js/enhanced-app-entry.js" defer></script>
 </body>
 </html>

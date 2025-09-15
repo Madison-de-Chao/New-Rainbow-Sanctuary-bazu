@@ -1,8 +1,8 @@
 // 神煞計算模組
 // 完整的八字神煞計算和效果描述
 
-// 神煞效果描述資料庫
-const SHENSHA_EFFECTS = {
+// 神煞效果描述資料庫 - 使用安全的全域變數宣告
+window.SHENSHA_EFFECTS = window.SHENSHA_EFFECTS || {
   // 吉神
   "天乙貴人": {
     effect: "逢兇化吉、得貴相助",
