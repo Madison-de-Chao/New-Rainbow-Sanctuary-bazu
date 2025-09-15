@@ -392,12 +392,352 @@ canvas#fiveChart {
   animation: particleMove 20s ease-in-out infinite;
 }
 
+/* Enhanced Results Section Styling */
+
+.analysis-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.analysis-section:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 110, 196, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 110, 196, 0.2);
+}
+
+.analysis-section h3 {
+  color: #ff6ec4;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pillars-enhanced {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.pillars-enhanced h3 {
+  color: #ff6ec4;
+  font-size: 1.4rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+#pillars {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.pillar-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.pillar-card.year-pillar {
+  border-color: #ff6ec4;
+  box-shadow: 0 4px 20px rgba(255, 110, 196, 0.2);
+}
+
+.pillar-card.month-pillar {
+  border-color: #7873f5;
+  box-shadow: 0 4px 20px rgba(120, 115, 245, 0.2);
+}
+
+.pillar-card.day-pillar {
+  border-color: #00d4ff;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.2);
+}
+
+.pillar-card.hour-pillar {
+  border-color: #ff9500;
+  box-shadow: 0 4px 20px rgba(255, 149, 0, 0.2);
+}
+
+.pillar-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.pillar-main {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  color: white;
+}
+
+.pillar-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.detail-label {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  font-weight: 500;
+  color: white;
+}
+
+/* Ten Gods Display */
+#ten-gods-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.ten-god-item {
+  background: rgba(120, 115, 245, 0.1);
+  border: 1px solid rgba(120, 115, 245, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.ten-god-item:hover {
+  background: rgba(120, 115, 245, 0.2);
+  transform: translateY(-3px);
+}
+
+.ten-god-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #7873f5;
+  margin-bottom: 0.5rem;
+}
+
+.ten-god-pillar {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.ten-god-meaning {
+  font-size: 0.8rem;
+  color: #aaa;
+  line-height: 1.4;
+}
+
+/* Nayin Display */
+#nayin-display {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.nayin-item {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.nayin-item:hover {
+  background: rgba(0, 212, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+.nayin-pillar {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #00d4ff;
+  margin-bottom: 0.5rem;
+}
+
+.nayin-name {
+  font-size: 1.1rem;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.nayin-meaning {
+  font-size: 0.9rem;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+/* Enhanced Shensha Display */
+#shensha-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.shensha-item {
+  background: rgba(255, 149, 0, 0.1);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.shensha-item:hover {
+  background: rgba(255, 149, 0, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(255, 149, 0, 0.3);
+}
+
+.shensha-name {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #ff9500;
+  margin-bottom: 0.5rem;
+}
+
+.shensha-pillar {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.shensha-effect {
+  font-size: 0.9rem;
+  color: #ddd;
+  line-height: 1.4;
+}
+
+/* Detailed Stories Button */
+.detailed-stories-btn {
+  background: linear-gradient(135deg, #ff6ec4, #7873f5);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1.5rem;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(255, 110, 196, 0.3);
+}
+
+.detailed-stories-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 110, 196, 0.4);
+}
+
+/* Chart Section Enhancement */
+#chart-section {
+  text-align: center;
+}
+
+#fiveChart {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(255, 110, 196, 0.2);
+}
+
+/* Yin Yang Section */
+#yin-yang-section {
+  text-align: center;
+}
+
+#yinYang {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.yin-yang-item {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.yin-yang-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.yin-yang-label {
+  font-size: 1.1rem;
+  color: #ccc;
+  margin-bottom: 0.5rem;
+}
+
+.yin-yang-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  #pillars {
+    grid-template-columns: 1fr;
+  }
+  
+  #ten-gods-display,
+  #nayin-display,
+  #shensha-info {
+    grid-template-columns: 1fr;
+  }
+  
+  #yinYang {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .analysis-section {
+    padding: 1.5rem;
+  }
+}
+
 @keyframes particleMove {
   0%, 100% {
     transform: translateX(0) translateY(0);
   }
   33% {
     transform: translateX(30px) translateY(-30px);
+  }
+  66% {
+    transform: translateX(-20px) translateY(20px);
+  }
+}
   }
   66% {
     transform: translateX(-20px) translateY(20px);

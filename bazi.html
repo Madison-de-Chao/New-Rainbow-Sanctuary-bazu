@@ -27,11 +27,50 @@
         <button onclick="goBack()" class="back-btn">重新輸入</button>
       </div>
       <div id="result-container">
-        <div id="pillars"></div>
-        <div id="narrative"></div>
-        <div id="shensha-info"></div>
-        <canvas id="fiveChart" width="300" height="300"></canvas>
-        <div id="yinYang"></div>
+        <!-- Enhanced Four Pillars Display -->
+        <div id="pillars-enhanced" class="pillars-enhanced">
+          <h3>🏛️ 四柱軍團陣列</h3>
+          <div id="pillars"></div>
+        </div>
+
+        <!-- Ten Gods Display -->
+        <div id="ten-gods-section" class="analysis-section">
+          <h3>⚔️ 十神分析</h3>
+          <div id="ten-gods-display"></div>
+        </div>
+
+        <!-- Nayin Display -->
+        <div id="nayin-section" class="analysis-section">
+          <h3>🎵 納音五行</h3>
+          <div id="nayin-display"></div>
+        </div>
+
+        <!-- Shensha Display -->
+        <div id="shensha-enhanced" class="analysis-section">
+          <h3>🔮 神煞標章</h3>
+          <div id="shensha-info"></div>
+        </div>
+
+        <!-- Five Elements Chart -->
+        <div id="chart-section" class="analysis-section">
+          <h3>🌟 五行能量分布</h3>
+          <canvas id="fiveChart" width="300" height="300"></canvas>
+        </div>
+
+        <!-- Yin Yang Analysis -->
+        <div id="yin-yang-section" class="analysis-section">
+          <h3>☯️ 陰陽統計</h3>
+          <div id="yinYang"></div>
+        </div>
+
+        <!-- Narrative Section -->
+        <div id="narrative-section" class="analysis-section">
+          <h3>📜 軍團敘事</h3>
+          <div id="narrative"></div>
+          <button onclick="viewDetailedStories()" class="detailed-stories-btn">
+            📖 查看完整軍團故事
+          </button>
+        </div>
       </div>
       <button onclick="exportReport()">匯出報告</button>
     </section>
@@ -39,5 +78,11 @@
 
   <!-- Single entry point module with gradual migration approach -->
   <script type="module" src="js/enhanced-app-entry.js" defer></script>
+  <script>
+    // Global function for going back
+    function goBack() {
+      window.location.href = 'index.html';
+    }
+  </script>
 </body>
 </html>

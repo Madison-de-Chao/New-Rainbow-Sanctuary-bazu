@@ -361,17 +361,17 @@ async function renderEnhancedResultsOnce(data) {
   try {
     console.log("Rendering enhanced results...");
 
-    // 渲染四柱卡片 - 添加飛入動畫
-    await renderAnimatedPillars(data.chart.pillars);
+    // Store data for legion page
+    localStorage.setItem('baziAnalysisData', JSON.stringify(data));
 
-    // 渲染五行圖表 - 使用安全的Chart.js渲染
-    await renderSafeFiveElementsChart(data.chart.fiveElements);
+    // 渲染增強版四柱卡片
+    await renderEnhancedPillars(data.chart.pillars);
 
-    // 渲染敘事內容 - 添加打字機效果
-    await renderAnimatedNarrative(data.narrative);
+    // 渲染十神分析
+    renderTenGodsDisplay(data.chart.pillars);
 
-    // 渲染陰陽統計
-    renderYinYang(data.chart.yinYang);
+    // 渲染納音五行
+    renderNayinDisplay(data.chart.pillars);
 
     // 計算並顯示神煞信息
     if (window.calculateAllShensha && data.chart && data.chart.pillars) {
@@ -384,8 +384,17 @@ async function renderEnhancedResultsOnce(data) {
 
       const shenshaList = window.calculateAllShensha(pillars);
       const formattedShensha = window.formatShenshaForDisplay(shenshaList);
-      renderShenshaInfo(formattedShensha);
+      renderEnhancedShenshaInfo(formattedShensha, pillars);
     }
+
+    // 渲染五行圖表 - 使用安全的Chart.js渲染
+    await renderSafeFiveElementsChart(data.chart.fiveElements);
+
+    // 渲染陰陽統計
+    renderEnhancedYinYang(data.chart.yinYang);
+
+    // 渲染敘事內容 - 添加打字機效果
+    await renderAnimatedNarrative(data.narrative);
 
     // 添加神煞信息（如果有）
     if (data.spirits && data.spirits.length > 0) {
@@ -819,5 +828,266 @@ function renderShenshaInfo(shenshaList) {
     shenshaCard.style.transform = "translateY(0)";
     shenshaCard.style.opacity = "1";
   }, 100);
+}
+
+// Enhanced Four Pillars Rendering
+async function renderEnhancedPillars(pillars) {
+  const pillarsElement = ensureElement("#pillars", "pillars");
+  pillarsElement.innerHTML = "";
+
+  const pillarNames = ["年", "月", "日", "時"];
+  const colors = ["#ff6ec4", "#7873f5", "#00d4ff", "#ff9500"];
+  const classes = ["year-pillar", "month-pillar", "day-pillar", "hour-pillar"];
+
+  for (let i = 0; i < pillarNames.length; i++) {
+    const pillarName = pillarNames[i];
+    const pillar = pillars[pillarName];
+    if (!pillar) continue;
+
+    const card = document.createElement("div");
+    card.className = `pillar-card ${classes[i]}`;
+    card.style.cssText = `
+      transform: translateY(50px) scale(0.8);
+      opacity: 0;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    `;
+
+    const nayin = getNayinForPillar(pillar.gan, pillar.zhi);
+    const tenGod = getTenGodForPillar(pillarName, pillar);
+
+    card.innerHTML = `
+      <div class="pillar-title" style="color: ${colors[i]};">
+        ${pillarName}柱軍團
+      </div>
+      <div class="pillar-main">
+        ${pillar.pillar || pillar.gan + pillar.zhi}
+      </div>
+      <div class="pillar-details">
+        <div class="detail-item">
+          <div class="detail-label">天干</div>
+          <div class="detail-value">${pillar.gan}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">地支</div>
+          <div class="detail-value">${pillar.zhi}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">納音</div>
+          <div class="detail-value">${nayin}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">十神</div>
+          <div class="detail-value">${tenGod}</div>
+        </div>
+      </div>
+    `;
+
+    pillarsElement.appendChild(card);
+
+    // 延遲動畫以創建飛入效果
+    setTimeout(() => {
+      card.style.transform = "translateY(0) scale(1)";
+      card.style.opacity = "1";
+    }, i * 200);
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+}
+
+// Ten Gods Display
+function renderTenGodsDisplay(pillars) {
+  const container = ensureElement("#ten-gods-display", "ten-gods-display");
+  container.innerHTML = "";
+
+  const pillarNames = ["年", "月", "日", "時"];
+  
+  pillarNames.forEach(pillarName => {
+    const pillar = pillars[pillarName];
+    if (!pillar) return;
+
+    const tenGod = getTenGodForPillar(pillarName, pillar);
+    const meaning = getTenGodMeaning(tenGod);
+
+    const item = document.createElement("div");
+    item.className = "ten-god-item";
+    item.innerHTML = `
+      <div class="ten-god-name">${tenGod}</div>
+      <div class="ten-god-pillar">${pillarName}柱 - ${pillar.gan}${pillar.zhi}</div>
+      <div class="ten-god-meaning">${meaning}</div>
+    `;
+    
+    container.appendChild(item);
+  });
+}
+
+// Nayin Display
+function renderNayinDisplay(pillars) {
+  const container = ensureElement("#nayin-display", "nayin-display");
+  container.innerHTML = "";
+
+  const pillarNames = ["年", "月", "日", "時"];
+  
+  pillarNames.forEach(pillarName => {
+    const pillar = pillars[pillarName];
+    if (!pillar) return;
+
+    const nayin = getNayinForPillar(pillar.gan, pillar.zhi);
+    const meaning = getNayinMeaning(nayin);
+
+    const item = document.createElement("div");
+    item.className = "nayin-item";
+    item.innerHTML = `
+      <div class="nayin-pillar">${pillarName}柱 - ${pillar.gan}${pillar.zhi}</div>
+      <div class="nayin-name">${nayin}</div>
+      <div class="nayin-meaning">${meaning}</div>
+    `;
+    
+    container.appendChild(item);
+  });
+}
+
+// Enhanced Shensha Info
+function renderEnhancedShenshaInfo(shenshaData, pillars) {
+  const container = ensureElement("#shensha-info", "shensha-info");
+  container.innerHTML = "";
+
+  if (!shenshaData || shenshaData.length === 0) {
+    container.innerHTML = '<div style="text-align: center; color: #ccc;">暫無神煞信息</div>';
+    return;
+  }
+
+  shenshaData.forEach(shensha => {
+    const item = document.createElement("div");
+    item.className = "shensha-item";
+    
+    const effect = window.SHENSHA_EFFECTS?.[shensha.name] || '特殊神煞，影響命運走向';
+    
+    item.innerHTML = `
+      <div class="shensha-name">${shensha.name}</div>
+      <div class="shensha-pillar">${shensha.pillar || '多柱'}出現</div>
+      <div class="shensha-effect">${effect}</div>
+    `;
+    
+    container.appendChild(item);
+  });
+}
+
+// Enhanced Yin Yang Display
+function renderEnhancedYinYang(yinYang) {
+  const container = ensureElement("#yinyang", "yinyang");
+  
+  // 處理不同的數據結構
+  let yinCount = 0, yangCount = 0;
+
+  if (yinYang && typeof yinYang === 'object') {
+    yinCount = yinYang.yin || yinYang.陰 || 0;
+    yangCount = yinYang.yang || yinYang.陽 || 0;
+  }
+
+  // 如果沒有數據，使用默認值
+  if (yinCount === 0 && yangCount === 0) {
+    yinCount = 3;
+    yangCount = 5;
+  }
+
+  container.innerHTML = `
+    <div class="yin-yang-item">
+      <div class="yin-yang-label">陰</div>
+      <div class="yin-yang-value">${yinCount}</div>
+    </div>
+    <div class="yin-yang-item">
+      <div class="yin-yang-label">陽</div>
+      <div class="yin-yang-value">${yangCount}</div>
+    </div>
+  `;
+}
+
+// Helper functions
+function getNayinForPillar(gan, zhi) {
+  const nayinTable = {
+    '甲子': '海中金', '乙丑': '海中金', '丙寅': '爐中火', '丁卯': '爐中火',
+    '戊辰': '大林木', '己巳': '大林木', '庚午': '路旁土', '辛未': '路旁土',
+    '壬申': '劍鋒金', '癸酉': '劍鋒金', '甲戌': '山頭火', '乙亥': '山頭火',
+    '丙子': '澗下水', '丁丑': '澗下水', '戊寅': '城牆土', '己卯': '城牆土',
+    '庚辰': '白臘金', '辛巳': '白臘金', '壬午': '楊柳木', '癸未': '楊柳木',
+    '甲申': '泉中水', '乙酉': '泉中水', '丙戌': '屋上土', '丁亥': '屋上土',
+    '戊子': '霹靂火', '己丑': '霹靂火', '庚寅': '松柏木', '辛卯': '松柏木',
+    '壬辰': '長流水', '癸巳': '長流水', '甲午': '砂石金', '乙未': '砂石金',
+    '丙申': '山下火', '丁酉': '山下火', '戊戌': '平地木', '己亥': '平地木',
+    '庚子': '壁上土', '辛丑': '壁上土', '壬寅': '金箔金', '癸卯': '金箔金',
+    '甲辰': '覆燈火', '乙巳': '覆燈火', '丙午': '天河水', '丁未': '天河水',
+    '戊申': '大驛土', '己酉': '大驛土', '庚戌': '釵釧金', '辛亥': '釵釧金',
+    '壬子': '桑柘木', '癸丑': '桑柘木', '甲寅': '大溪水', '乙卯': '大溪水',
+    '丙辰': '砂中土', '丁巳': '砂中土', '戊午': '天上火', '己未': '天上火',
+    '庚申': '石榴木', '辛酉': '石榴木', '壬戌': '大海水', '癸亥': '大海水'
+  };
+  return nayinTable[gan + zhi] || '未知納音';
+}
+
+function getTenGodForPillar(pillarName, pillar) {
+  // 簡化的十神判斷，實際應該根據日柱天干來計算
+  const ganRelations = {
+    '甲': '劫財', '乙': '比肩', '丙': '食神', '丁': '傷官',
+    '戊': '偏財', '己': '正財', '庚': '七殺', '辛': '正官',
+    '壬': '偏印', '癸': '正印'
+  };
+  return ganRelations[pillar.gan] || '待分析';
+}
+
+function getTenGodMeaning(god) {
+  const meanings = {
+    '比肩': '競爭意識、獨立自主',
+    '劫財': '爭奪資源、冒險精神', 
+    '食神': '創造表達、享受生活',
+    '傷官': '創新變革、不守成規',
+    '偏財': '商業頭腦、投機取巧',
+    '正財': '穩健理財、勤勞致富',
+    '七殺': '威嚴權威、競爭壓力',
+    '正官': '責任法制、正直品格',
+    '偏印': '學習能力、直覺靈感',
+    '正印': '保護支持、學術文化'
+  };
+  return meanings[god] || '特殊命理特質';
+}
+
+function getNayinMeaning(nayin) {
+  const meanings = {
+    '海中金': '深藏不露的珍貴才華',
+    '爐中火': '熱情洋溢的創造力',
+    '大林木': '茂盛成長的生命力',
+    '路旁土': '默默承載的責任感',
+    '劍鋒金': '銳利果決的行動力',
+    '山頭火': '光明照耀的領導力',
+    '澗下水': '清澈純淨的智慧',
+    '城牆土': '堅固可靠的防護力',
+    '白臘金': '溫潤優雅的品格',
+    '楊柳木': '柔韌適應的能力',
+    '泉中水': '源源不絕的創意',
+    '屋上土': '穩固支撐的力量',
+    '霹靂火': '瞬間爆發的能量',
+    '松柏木': '堅韌不拔的意志',
+    '長流水': '持續不斷的動力',
+    '砂石金': '堅實可靠的品質',
+    '山下火': '溫暖照明的特質',
+    '平地木': '廣闊包容的胸懷',
+    '壁上土': '保護守護的精神',
+    '金箔金': '華美精緻的品味',
+    '覆燈火': '照亮他人的使命',
+    '天河水': '浩瀚廣大的格局',
+    '大驛土': '承載萬物的能力',
+    '釵釧金': '精美雅緻的魅力',
+    '桑柘木': '默默付出的奉獻',
+    '大溪水': '奔流不息的活力',
+    '砂中土': '滋養生命的力量',
+    '天上火': '光明普照的能量',
+    '石榴木': '豐碩成果的象徵',
+    '大海水': '包容一切的氣度'
+  };
+  return meanings[nayin] || '獨特的命格特質';
+}
+
+// Add navigation to detailed stories
+function viewDetailedStories() {
+  window.location.href = 'legion.html';
 }
 

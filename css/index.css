@@ -75,9 +75,9 @@ canvas#particles-bg {
 }
 
 .tone-selector select {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 0.8rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -95,10 +95,10 @@ canvas#particles-bg {
   text-align: center;
   margin-bottom: 2rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.4);
   border-radius: 12px;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   max-width: 500px;
   width: 100%;
 }
@@ -119,9 +119,9 @@ canvas#particles-bg {
 
 .name-field input,
 .name-field select {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 0.8rem 1rem;
   border-radius: 8px;
   font-size: 1rem;
@@ -160,9 +160,9 @@ canvas#particles-bg {
 }
 
 .birth-fields select {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   padding: 0.8rem;
   border-radius: 8px;
   font-size: 0.95rem;
