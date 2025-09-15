@@ -1,8 +1,8 @@
-const API_BASE = "https://rainbow-sanctuary-bazu-production.up.railway.app";
+window.API_BASE ??= "https://rainbow-sanctuary-bazu-production.up.railway.app";
 
 // 呼叫後端 API，取得敘事報告
 async function fetchReport(pillars, tone = "default") {
-  const res = await fetch(`${API_BASE}/report`, {
+  const res = await fetch(`${window.API_BASE}/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ pillars, tone })
@@ -22,7 +22,7 @@ async function calculateBaziFromDatabase(birthData) {
     use_true_solar_time: false
   };
 
-  const res = await fetch(`${API_BASE}/api/bazi/compute`, {
+  const res = await fetch(`${window.API_BASE}/api/bazi/compute`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(apiData)

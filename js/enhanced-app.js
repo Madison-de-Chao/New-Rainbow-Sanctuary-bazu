@@ -1,5 +1,13 @@
 // 增強版八字應用 - 修正版：解決appendChild null和Chart.js重複建圖問題
 
+// 防止重複載入
+if (window.__ENH_APP_LOADED__) {
+  console.warn("Enhanced app already loaded, skipping duplicate load");
+  // Don't throw error to avoid breaking the page completely
+} else {
+  window.__ENH_APP_LOADED__ = true;
+}
+
 // A. 防止 appendChild 對 null 的工具函數
 function ensureElement(selector, fallbackId, fallbackTag = 'div') {
   let el = document.querySelector(selector);
@@ -33,7 +41,7 @@ function renderAnimatedChart(canvasId, config) {
 }
 
 // C. 防止重複渲染的狀態管理
-let rendering = false;
+window.rendering ??= false;
 
 // D. 安全的localStorage包裝
 const storage = (() => {
@@ -343,12 +351,12 @@ async function generateFreshData() {
 
 // C. 保證只渲染一次的主渲染函數
 async function renderEnhancedResultsOnce(data) {
-  if (rendering) {
+  if (window.rendering) {
     console.log("Already rendering, skipping...");
     return;
   }
 
-  rendering = true;
+  window.rendering = true;
   try {
     console.log("Rendering enhanced results...");
 
@@ -385,7 +393,7 @@ async function renderEnhancedResultsOnce(data) {
   } catch (error) {
     console.error("Error in renderEnhancedResultsOnce:", error);
   } finally {
-    rendering = false;
+    window.rendering = false;
   }
 }
 

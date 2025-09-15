@@ -2,7 +2,7 @@
 // 完整的八字神煞計算和效果描述
 
 // 神煞效果描述資料庫
-const SHENSHA_EFFECTS = {
+window.SHENSHA_EFFECTS ??= {
   // 吉神
   "天乙貴人": {
     effect: "逢兇化吉、得貴相助",
@@ -113,7 +113,7 @@ function calculateTianyiGuiren(dayGan, pillars) {
   return foundPillars.length > 0 ? {
     name: "天乙貴人",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["天乙貴人"]
+    ...window.SHENSHA_EFFECTS["天乙貴人"]
   } : null;
 }
 
@@ -139,7 +139,7 @@ function calculateTaohua(yearZhi, pillars) {
   return foundPillars.length > 0 ? {
     name: "桃花",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["桃花"]
+    ...window.SHENSHA_EFFECTS["桃花"]
   } : null;
 }
 
@@ -165,7 +165,7 @@ function calculateYima(yearZhi, pillars) {
   return foundPillars.length > 0 ? {
     name: "驛馬",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["驛馬"]
+    ...window.SHENSHA_EFFECTS["驛馬"]
   } : null;
 }
 
@@ -189,7 +189,7 @@ function calculateWenchang(yearGan, pillars) {
   return foundPillars.length > 0 ? {
     name: "文昌",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["文昌"]
+    ...window.SHENSHA_EFFECTS["文昌"]
   } : null;
 }
 
@@ -215,7 +215,7 @@ function calculateHuagai(yearZhi, pillars) {
   return foundPillars.length > 0 ? {
     name: "華蓋",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["華蓋"]
+    ...window.SHENSHA_EFFECTS["華蓋"]
   } : null;
 }
 
@@ -252,7 +252,7 @@ function calculateKongwang(dayPillar, pillars) {
   return foundPillars.length > 0 ? {
     name: "空亡",
     pillars: foundPillars,
-    ...SHENSHA_EFFECTS["空亡"]
+    ...window.SHENSHA_EFFECTS["空亡"]
   } : null;
 }
 
@@ -314,4 +314,3 @@ function formatShenshaForDisplay(shenshaList) {
 // 導出函數
 window.calculateAllShensha = calculateAllShensha;
 window.formatShenshaForDisplay = formatShenshaForDisplay;
-window.SHENSHA_EFFECTS = SHENSHA_EFFECTS;
