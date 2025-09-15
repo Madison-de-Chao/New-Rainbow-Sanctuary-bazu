@@ -1,8 +1,8 @@
-const API_BASE = "https://rainbow-sanctuary-bazu-production.up.railway.app";
+window.API_BASE ??= "https://rainbow-sanctuary-bazu-production.up.railway.app";
 
 // 呼叫後端 API，取得敘事報告
 async function fetchReport(pillars, tone = "default") {
-  const res = await fetch(`${API_BASE}/report`, {
+  const res = await fetch(`${window.API_BASE}/report`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ pillars, tone })
@@ -22,7 +22,7 @@ async function calculateBaziFromDatabase(birthData) {
     use_true_solar_time: false
   };
 
-  const res = await fetch(`${API_BASE}/api/bazi/compute`, {
+  const res = await fetch(`${window.API_BASE}/api/bazi/compute`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(apiData)
@@ -304,27 +304,33 @@ function enterSiteOld() {
 // 動態生成年份選單
 window.addEventListener("DOMContentLoaded", () => {
   const yearSelect = document.getElementById("birth-year");
-  for (let y = 1900; y <= new Date().getFullYear(); y++) {
-    const opt = document.createElement("option");
-    opt.value = y;
-    opt.textContent = y + "年";
-    yearSelect.appendChild(opt);
+  if (yearSelect) {
+    for (let y = 1900; y <= new Date().getFullYear(); y++) {
+      const opt = document.createElement("option");
+      opt.value = y;
+      opt.textContent = y + "年";
+      yearSelect.appendChild(opt);
+    }
   }
 
   const monthSelect = document.getElementById("birth-month");
-  for (let m = 1; m <= 12; m++) {
-    const opt = document.createElement("option");
-    opt.value = m;
-    opt.textContent = m + "月";
-    monthSelect.appendChild(opt);
+  if (monthSelect) {
+    for (let m = 1; m <= 12; m++) {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = m + "月";
+      monthSelect.appendChild(opt);
+    }
   }
 
   const daySelect = document.getElementById("birth-day");
-  for (let d = 1; d <= 31; d++) {
-    const opt = document.createElement("option");
-    opt.value = d;
-    opt.textContent = d + "日";
-    daySelect.appendChild(opt);
+  if (daySelect) {
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement("option");
+      opt.value = d;
+      opt.textContent = d + "日";
+      daySelect.appendChild(opt);
+    }
   }
 });
 

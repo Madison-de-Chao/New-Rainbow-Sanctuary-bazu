@@ -2,25 +2,25 @@
 // 使用 OpenAI API 生成個性化的八字軍團故事
 
 // 角色映射表
-const GAN_ROLE = {
+window.GAN_ROLE ??= {
   "甲":"森林將軍","乙":"花草軍師","丙":"烈日戰神","丁":"燭光法師","戊":"山嶽守護",
   "己":"大地母親","庚":"鋼鐵騎士","辛":"珠寶商人","壬":"江河船長","癸":"甘露天使"
 };
 
-const ZHI_ROLE = {
+window.ZHI_ROLE ??= {
   "子":"夜行刺客","丑":"忠犬守衛","寅":"森林獵人","卯":"春兔使者","辰":"龍族法師","巳":"火蛇術士",
   "午":"烈馬騎兵","未":"溫羊牧者","申":"靈猴戰士","酉":"金雞衛士","戌":"戰犬統領","亥":"海豚智者"
 };
 
 // 十神敘事
-const TEN_GOD_NARRATIVE = {
+window.TEN_GOD_NARRATIVE ??= {
   "比肩":"自我推進、競爭力強","劫財":"資源分享、合作亦競合","食神":"創造表達、福氣延展","傷官":"突破框架、表現慾強",
   "偏印":"靈感學習、支援多","正印":"庇蔭資源、學習成長","偏財":"機會財、外部資源","正財":"穩健財、務實經營",
   "七殺":"行動果決、承壓挑戰","正官":"紀律責任、制度資源"
 };
 
-// 神煞效果
-const SHENSHA_EFFECTS = {
+// 神煞效果 (簡化版用於故事生成)
+const SHENSHA_SIMPLE_EFFECTS = {
   "天乙貴人":"逢兇化吉、得貴相助","桃花":"人緣魅力、社交順利","驛馬":"奔波變動、機動力強",
   "文昌":"學習能力、文采出眾","華蓋":"藝術天賦、獨特品味","金輿":"財富運勢、物質豐富",
   "空亡":"變化無常、需要適應","羊刃":"行動力強、需要節制","沖煞":"衝突挑戰、突破機會"
@@ -34,7 +34,7 @@ function generateStoryPrompt(pillarKey, pillarData, userData = {}) {
   const commanderTitle = GAN_ROLE[stem] || stem;
   const strategistTitle = ZHI_ROLE[branch] || branch;
   const tenGodDesc = TEN_GOD_NARRATIVE[tenGod] || tenGod;
-  const shenshaDesc = shensha.map(s => SHENSHA_EFFECTS[s] || s).join('、');
+  const shenshaDesc = shensha.map(s => SHENSHA_SIMPLE_EFFECTS[s] || s).join('、');
   
   const pillarDomains = {
     "年": "家族脈絡與社會舞台",
