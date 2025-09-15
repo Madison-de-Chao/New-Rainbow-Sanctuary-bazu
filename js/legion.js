@@ -210,13 +210,19 @@ function getDepthAnalysis(pillarKey, pillar, data) {
     const nayin = getNayin(gan, zhi);
     
     return `
-        <strong>五行分析：</strong>${gan}屬${getGanElement(gan)}，${zhi}屬${getZhiElement(zhi)}，此柱五行配置體現了${getElementInteraction(gan, zhi)}的特質。<br><br>
+        <strong>🔍 命理核心分析：</strong>${gan}屬${getGanElement(gan)}，${zhi}屬${getZhiElement(zhi)}，此柱五行配置體現了${getElementInteraction(gan, zhi)}的特質。干支相配展現${getGanZhiHarmony(gan, zhi)}的能量場。<br><br>
         
-        <strong>納音解讀：</strong>${nayin}代表${getNayinMeaning(nayin)}，在${pillarKey}柱的位置上，象徵著${getNayinInPosition(nayin, pillarKey)}。<br><br>
+        <strong>🎵 納音深度解讀：</strong>${nayin}在命理學中代表${getNayinMeaning(nayin)}。在${pillarKey}柱的位置上，象徵著${getNayinInPosition(nayin, pillarKey)}。此納音與生俱來的特質將在${getLifePhase(pillarKey)}階段發揮重要作用。<br><br>
         
-        <strong>生活影響：</strong>此柱在實際生活中主要影響${getPillarLifeAspect(pillarKey)}，建議在這些方面要${getPillarAdvice(pillarKey, pillar)}。<br><br>
+        <strong>🏛️ 生活層面影響：</strong>此柱在現實生活中主要影響${getPillarLifeAspect(pillarKey)}。${gan}天干的${getGanNature(gan)}特質，結合${zhi}地支的${getZhiNature(zhi)}能量，在這些方面要${getPillarAdvice(pillarKey, pillar)}。<br><br>
         
-        <strong>發展建議：</strong>充分發揮${gan}的${getGanStrength(gan)}特質，同時運用${zhi}的${getZhiStrength(zhi)}能力，可以在${pillarKey === '年' ? '家庭關係' : pillarKey === '月' ? '事業發展' : pillarKey === '日' ? '個人成長' : '未來規劃'}方面取得突破。
+        <strong>⚔️ 十神關係分析：</strong>作為${getTenGod(pillarKey, pillar)}，此柱體現了${getTenGodDetailedMeaning(getTenGod(pillarKey, pillar))}的特質。在人生格局中扮演${getTenGodRole(getTenGod(pillarKey, pillar))}的角色。<br><br>
+        
+        <strong>🔮 神煞加持效應：</strong>${getShensha(pillarKey, pillar, data)}等神煞的出現，為此柱增添了${getShenshaInfluence(pillarKey)}的特殊能量。<br><br>
+        
+        <strong>🌟 發展策略建議：</strong>充分發揮${gan}的${getGanStrength(gan)}特質，同時運用${zhi}的${getZhiStrength(zhi)}能力，結合${nayin}的${getNayinPower(nayin)}優勢，可以在${pillarKey === '年' ? '家庭關係與個人根基' : pillarKey === '月' ? '事業發展與人際網絡' : pillarKey === '日' ? '個人成長與感情生活' : '創新創造與未來規劃'}方面取得重大突破。<br><br>
+        
+        <strong>📈 運勢週期提醒：</strong>此柱的能量在${getOptimalTiming(pillarKey, pillar)}時期最為活躍，建議在這些時間段內重點把握機會，積極行動。
     `;
 }
 
@@ -452,6 +458,198 @@ function getZhiStrength(zhi) {
         '申': '聰明活潑', '酉': '精確務實', '戌': '忠誠守護', '亥': '純真厚道'
     };
     return strengths[zhi] || '特殊能力';
+}
+
+// 新增的增強分析函數
+function getGanZhiHarmony(gan, zhi) {
+    const ganElement = getGanElement(gan);
+    const zhiElement = getZhiElement(zhi);
+    
+    if (ganElement === zhiElement) {
+        return '干支同氣，力量集中';
+    }
+    
+    // 相生關係
+    const shengCycles = {
+        '木': '火', '火': '土', '土': '金', '金': '水', '水': '木'
+    };
+    
+    if (shengCycles[ganElement] === zhiElement) {
+        return '干生支，主動給予';
+    } else if (shengCycles[zhiElement] === ganElement) {
+        return '支生干，被動接受';
+    }
+    
+    // 相剋關係
+    const keCycles = {
+        '木': '土', '火': '金', '土': '水', '金': '木', '水': '火'
+    };
+    
+    if (keCycles[ganElement] === zhiElement) {
+        return '干克支，主導控制';
+    } else if (keCycles[zhiElement] === ganElement) {
+        return '支克干，承受壓力';
+    }
+    
+    return '陰陽互補，平衡和諧';
+}
+
+function getGanNature(gan) {
+    const natures = {
+        '甲': '剛健進取，具有開創精神',
+        '乙': '柔韌適應，富有包容力',
+        '丙': '光明熱烈，充滿正能量',
+        '丁': '細膩溫和，內斂而堅韌',
+        '戊': '厚德載物，承載責任',
+        '己': '謙遜務實，默默奉獻',
+        '庚': '剛正不阿，果斷決絕',
+        '辛': '精緻優雅，注重品質',
+        '壬': '智慧流動，變化無窮',
+        '癸': '純淨透澈，滋養萬物'
+    };
+    return natures[gan] || '獨特天性';
+}
+
+function getZhiNature(zhi) {
+    const natures = {
+        '子': '機敏活潑，善於變通',
+        '丑': '忠厚老實，穩紮穩打',
+        '寅': '勇敢無畏，開拓進取',
+        '卯': '溫文儒雅，和諧共處',
+        '辰': '靈活多變，富有想像',
+        '巳': '深沉智慧，洞察先機',
+        '午': '熱情奔放，積極向上',
+        '未': '溫柔體貼，細心周到',
+        '申': '聰明機智，反應敏捷',
+        '酉': '嚴謹有序，精益求精',
+        '戌': '忠誠可靠，守護至上',
+        '亥': '寬厚包容，純真善良'
+    };
+    return natures[zhi] || '特殊品性';
+}
+
+function getTenGodDetailedMeaning(tenGod) {
+    const detailedMeanings = {
+        '比肩': '代表競爭與合作的雙重特質，具有獨立自主的性格，在團體中能夠發揮領導作用',
+        '劫財': '象徵冒險與機遇並存，勇於挑戰現狀，具有突破傳統的創新精神',
+        '食神': '體現創造與表達的天賦，享受生活的美好，能夠將內在才華轉化為實際成果',
+        '傷官': '代表變革與創新的力量，不拘泥於傳統規範，具有獨特的見解和表達方式',
+        '偏財': '象徵商業頭腦和投資眼光，善於把握機會，具有靈活的財務運作能力',
+        '正財': '體現穩健的理財觀念，通過勤勞努力獲得財富，重視長期的積累和保值',
+        '七殺': '代表權威與壓力的轉化，在挑戰中成長，具有克服困難的強大意志力',
+        '正官': '象徵責任與法制觀念，正直廉潔，具有服務社會和維護正義的使命感',
+        '偏印': '體現學習與直覺的天賦，善於吸收新知識，具有敏銳的洞察力和創新思維',
+        '正印': '代表保護與支持的力量，重視學術文化，具有深厚的人文底蘊和教育情懷'
+    };
+    return detailedMeanings[tenGod] || '具有特殊的命理意義，需要深入分析其在整體格局中的作用';
+}
+
+function getTenGodRole(tenGod) {
+    const roles = {
+        '比肩': '平等競爭者與合作夥伴',
+        '劫財': '資源爭奪者與機會創造者',
+        '食神': '創意表達者與生活享受者',
+        '傷官': '創新變革者與規則挑戰者',
+        '偏財': '投機冒險者與機會捕捉者',
+        '正財': '穩健經營者與財富積累者',
+        '七殺': '權威挑戰者與困境克服者',
+        '正官': '責任承擔者與秩序維護者',
+        '偏印': '知識探索者與靈感啟發者',
+        '正印': '智慧傳承者與文化守護者'
+    };
+    return roles[tenGod] || '特殊角色扮演者';
+}
+
+function getShenshaInfluence(pillarKey) {
+    const influences = {
+        '年': '家族運勢與祖德庇佑',
+        '月': '事業發展與貴人助力',
+        '日': '個人魅力與感情運勢',
+        '時': '創造靈感與子女運勢'
+    };
+    return influences[pillarKey] || '特殊的命運影響';
+}
+
+function getNayinPower(nayin) {
+    const powers = {
+        '海中金': '深藏的珍貴潛能',
+        '爐中火': '變革創新的驅動力',
+        '大林木': '蓬勃成長的生命力',
+        '路旁土': '默默承載的支撐力',
+        '劍鋒金': '銳利突破的行動力',
+        '山頭火': '光明照耀的領導力',
+        '澗下水': '清澈純淨的智慧力',
+        '城牆土': '堅固守護的保護力',
+        '白臘金': '溫潤精緻的品格力',
+        '楊柳木': '靈活適應的變通力',
+        '泉中水': '源源不絕的創造力',
+        '屋上土': '穩固支撐的基礎力',
+        '霹靂火': '瞬間爆發的衝擊力',
+        '松柏木': '堅韌不拔的持久力',
+        '長流水': '持續不斷的推動力',
+        '砂石金': '堅實可靠的執行力',
+        '山下火': '溫暖照明的感化力',
+        '平地木': '廣闊包容的涵養力',
+        '壁上土': '保護守衛的防禦力',
+        '金箔金': '華美精緻的表現力',
+        '覆燈火': '照亮他人的奉獻力',
+        '天河水': '浩瀚宏大的格局力',
+        '大驛土': '承載萬物的包容力',
+        '釵釧金': '精美雅緻的藝術力',
+        '桑柘木': '默默付出的貢獻力',
+        '大溪水': '奔流不息的活力',
+        '砂中土': '滋養生命的培育力',
+        '天上火': '光明普照的影響力',
+        '石榴木': '豐碩成果的收穫力',
+        '大海水': '包容一切的胸懷力'
+    };
+    return powers[nayin] || '獨特的能量優勢';
+}
+
+function getLifePhase(pillarKey) {
+    const phases = {
+        '年': '童年成長與青少年發展',
+        '月': '青年奮鬥與中年事業',
+        '日': '成年自我實現',
+        '時': '晚年智慧與傳承延續'
+    };
+    return phases[pillarKey] || '人生重要階段';
+}
+
+function getOptimalTiming(pillarKey, pillar) {
+    const gan = pillar.gan;
+    const zhi = pillar.zhi;
+    
+    // 根據天干地支確定最佳時機
+    const ganTiming = {
+        '甲': '春季、寅卯月份',
+        '乙': '春末夏初、辰巳月份',
+        '丙': '夏季、午未月份',
+        '丁': '夏末秋初、未申月份',
+        '戊': '四季月、辰戌丑未月',
+        '己': '四季土旺時、每季末月',
+        '庚': '秋季、申酉月份',
+        '辛': '秋末冬初、戌亥月份',
+        '壬': '冬季、亥子月份',
+        '癸': '冬末春初、子丑月份'
+    };
+    
+    const zhiTiming = {
+        '子': '夜間11點-1點，冬至前後',
+        '丑': '凌晨1點-3點，十二月',
+        '寅': '凌晨3點-5點，正月',
+        '卯': '清晨5點-7點，二月',
+        '辰': '上午7點-9點，三月',
+        '巳': '上午9點-11點，四月',
+        '午': '中午11點-1點，五月',
+        '未': '下午1點-3點，六月',
+        '申': '下午3點-5點，七月',
+        '酉': '下午5點-7點，八月',
+        '戌': '晚上7點-9點，九月',
+        '亥': '晚上9點-11點，十月'
+    };
+    
+    return `${ganTiming[gan] || '特定時期'}以及${zhiTiming[zhi] || '特殊時段'}`;
 }
 
 function showError(message) {
