@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>四時軍團詳細故事 · 虹靈御所</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/legion.css" />
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+</head>
+<body>
+  <div class="legion-container">
+    <header class="legion-header">
+      <button onclick="goBack()" class="back-btn">← 返回結果頁</button>
+      <h1 class="legion-title">你的四時軍團故事</h1>
+      <p class="legion-subtitle">每個軍團的完整150字故事與命盤解釋</p>
+    </header>
+
+    <main class="legion-content">
+      <!-- 軍團故事將在這裡動態生成 -->
+      <div id="legion-stories" class="legion-stories">
+        <!-- Stories will be inserted here by JavaScript -->
+      </div>
+    </main>
+
+    <aside class="legion-sidebar">
+      <div class="legend-panel">
+        <h3>🔮 神煞解釋</h3>
+        <div id="shensha-legends"></div>
+      </div>
+      
+      <div class="legend-panel">
+        <h3>⚔️ 十神含義</h3>
+        <div id="tengod-legends"></div>
+      </div>
+      
+      <div class="legend-panel">
+        <h3>🎵 納音五行</h3>
+        <div id="nayin-legends"></div>
+      </div>
+    </aside>
+
+    <footer class="legion-footer">
+      <button onclick="exportLegionReport()" class="export-btn">📜 匯出軍團故事</button>
+      <button onclick="shareStories()" class="share-btn">📤 分享故事</button>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/ai-narrative.js"></script>
+  <script src="js/ai-story-generator.js"></script>
+  <script src="js/legion.js"></script>
+</body>
+</html>
