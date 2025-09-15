@@ -1,0 +1,276 @@
+name: Application Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  functional-tests:
+    name: Functional Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Test application startup
+      run: |
+        echo "Testing application startup..."
+        
+        # Start the application server
+        python3 -m http.server 8000 &
+        SERVER_PID=$!
+        
+        # Wait for server to start
+        sleep 3
+        
+        # Test if server is responding
+        if curl -f http://localhost:8000/ > /dev/null 2>&1; then
+          echo "✅ Application server started successfully"
+        else
+          echo "❌ Application server failed to start"
+          kill $SERVER_PID 2>/dev/null || true
+          exit 1
+        fi
+        
+        # Test key pages
+        pages=("index.html" "bazi.html" "report.html" "test-cases.html")
+        for page in "${pages[@]}"; do
+          if curl -f "http://localhost:8000/$page" > /dev/null 2>&1; then
+            echo "✅ $page is accessible"
+          else
+            echo "❌ $page is not accessible"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+        done
+        
+        # Clean up
+        kill $SERVER_PID 2>/dev/null || true
+        echo "✅ Application startup test completed"
+
+  data-validation:
+    name: Data Validation Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate sample data
+      run: |
+        echo "Validating sample data structure..."
+        
+        # Check if sample.json exists and is valid
+        if [ -f "data/sample.json" ]; then
+          echo "Validating data/sample.json..."
+          
+          # Basic JSON syntax validation
+          if python3 -m json.tool data/sample.json > /dev/null; then
+            echo "✅ data/sample.json is valid JSON"
+          else
+            echo "❌ data/sample.json has JSON syntax errors"
+            exit 1
+          fi
+          
+          # Check for required keys in JSON
+          if grep -q "sampleChart" data/sample.json && grep -q "sampleNarrative" data/sample.json && grep -q "toneSettings" data/sample.json; then
+            echo "✅ data/sample.json contains required top-level keys"
+          else
+            echo "❌ data/sample.json missing required keys"
+            exit 1
+          fi
+          
+          # Check for pillar structure
+          if grep -q "pillars" data/sample.json; then
+            echo "✅ data/sample.json contains pillars structure"
+          else
+            echo "❌ data/sample.json missing pillars structure"
+            exit 1
+          fi
+          
+          # Check for five elements
+          if grep -q "fiveElements" data/sample.json; then
+            echo "✅ data/sample.json contains fiveElements"
+          else
+            echo "❌ data/sample.json missing fiveElements"
+            exit 1
+          fi
+          
+          echo "✅ All data validation checks passed"
+        else
+          echo "❌ data/sample.json not found"
+          exit 1
+        fi
+
+  javascript-functionality:
+    name: JavaScript Functionality Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install testing dependencies
+      run: |
+        # Install basic testing tools
+        npm init -y
+        npm install --save-dev jsdom
+        
+    - name: Test JavaScript modules
+      run: |
+        echo "Testing JavaScript functionality..."
+        
+        # Test if JavaScript files can be loaded without syntax errors
+        js_files=("js/app.js" "js/api.js" "js/enhanced-app.js" "js/enhanced-app-fixed.js")
+        
+        echo "Testing JavaScript files..."
+        for file in "${js_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            # Basic syntax validation using Node.js
+            if node -c "$file"; then
+              echo "✅ $file syntax is valid"
+            else
+              echo "❌ $file has syntax errors"
+              exit 1
+            fi
+          else
+            echo "⚠️  $file not found"
+          fi
+        done
+        
+        # Test if HTML files can be parsed
+        echo "Testing HTML files..."
+        html_files=("index.html" "bazi.html" "report.html" "test-cases.html")
+        
+        for file in "${html_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            # Basic HTML structure validation
+            if grep -q "<!DOCTYPE" "$file" && grep -q "</html>" "$file"; then
+              echo "✅ $file has proper HTML structure"
+            else
+              echo "⚠️  $file may have structure issues"
+            fi
+          else
+            echo "⚠️  $file not found"
+          fi
+        done
+        
+        echo "✅ All JavaScript functionality tests completed"
+
+  css-validation:
+    name: CSS Validation Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Test CSS files
+      run: |
+        echo "Testing CSS files..."
+        
+        css_files=(
+          "css/style.css"
+          "css/index.css"
+          "css/bazi.css"
+          "css/report.css"
+          "css/theme.css"
+        )
+        
+        for file in "${css_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Testing $file..."
+            
+            # Check for balanced brackets
+            open_brackets=$(grep -o '{' "$file" | wc -l)
+            close_brackets=$(grep -o '}' "$file" | wc -l)
+            
+            if [ $open_brackets -eq $close_brackets ]; then
+              echo "✅ $file has balanced brackets ($open_brackets pairs)"
+            else
+              echo "❌ $file has unbalanced brackets (open: $open_brackets, close: $close_brackets)"
+              exit 1
+            fi
+            
+            # Check for common CSS issues
+            if grep -q "color:\s*;" "$file"; then
+              echo "❌ $file has empty color values"
+              exit 1
+            fi
+            
+            if grep -q "font-size:\s*;" "$file"; then
+              echo "❌ $file has empty font-size values"
+              exit 1
+            fi
+            
+            echo "✅ $file passed basic validation"
+          else
+            echo "⚠️  $file not found"
+          fi
+        done
+        
+        echo "✅ CSS validation completed"
+
+  accessibility-check:
+    name: Accessibility Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check HTML accessibility features
+      run: |
+        echo "Checking HTML accessibility features..."
+        
+        html_files=("index.html" "bazi.html" "report.html" "test-cases.html")
+        
+        for file in "${html_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Checking $file for accessibility..."
+            
+            # Check for lang attribute
+            if grep -q 'lang=' "$file"; then
+              echo "✅ $file has lang attribute"
+            else
+              echo "⚠️  $file missing lang attribute"
+            fi
+            
+            # Check for alt attributes on images
+            img_count=$(grep -o '<img' "$file" | wc -l)
+            alt_count=$(grep -o 'alt=' "$file" | wc -l)
+            
+            if [ $img_count -gt 0 ]; then
+              if [ $img_count -eq $alt_count ]; then
+                echo "✅ $file: all $img_count images have alt attributes"
+              else
+                echo "⚠️  $file: $img_count images, but only $alt_count alt attributes"
+              fi
+            fi
+            
+            # Check for proper heading hierarchy
+            if grep -q '<h1' "$file"; then
+              echo "✅ $file has h1 heading"
+            else
+              echo "⚠️  $file missing h1 heading"
+            fi
+            
+          fi
+        done
+        
+        echo "✅ Accessibility check completed"

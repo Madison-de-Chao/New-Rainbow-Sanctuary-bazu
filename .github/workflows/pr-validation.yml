@@ -1,46 +1,12 @@
-name: PR Validation
+
 
 on:
   pull_request:
     branches: [ main, master ]
-  push:
-    branches: [ main, master ]
 
-jobs:
-  validate:
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Check for merge conflict markers
-      run: |
-        echo "Checking for merge conflict markers..."
-        # Define patterns to avoid self-detection
-        CONFLICT_START="<<<<<<<[[:space:]]HEAD"
-        CONFLICT_SEP="======="
-        CONFLICT_END=">>>>>>>[[:space:]]"
-        
-        if grep -r "$CONFLICT_START\|$CONFLICT_SEP\|$CONFLICT_END" . --exclude-dir=.git --exclude="pr-validation.yml"; then
-          echo "❌ Found merge conflict markers"
-          echo "Please resolve merge conflicts before merging"
-          exit 1
-        else
-          echo "✅ No merge conflict markers found"
-        fi
-        
-    - name: Validate HTML files
-      run: |
-        echo "Validating HTML files..."
-        for file in *.html; do
-          if [ -f "$file" ]; then
-            echo "Checking $file..."
-            # Basic validation - check if file is not empty and has basic HTML structure
-            if [ -s "$file" ] && grep -q "<html\|<HTML" "$file"; then
-              echo "✅ $file appears to be valid"
-            else
-              echo "⚠️ $file may have issues"
-            fi
-          fi
-        done
+

@@ -1,0 +1,293 @@
+name: Deployment Readiness Check
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  deployment-validation:
+    name: Deployment Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check deployment files
+      run: |
+        echo "Checking deployment readiness..."
+        
+        # Check for production-ready configurations
+        echo "Checking for production configurations..."
+        
+        # Verify all required static files are present
+        static_files=(
+          "index.html"
+          "bazi.html" 
+          "report.html"
+          "test-cases.html"
+          "css/style.css"
+          "js/app.js"
+          "data/sample.json"
+        )
+        
+        missing_files=()
+        for file in "${static_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file ready for deployment"
+          else
+            echo "❌ $file missing for deployment"
+            missing_files+=("$file")
+          fi
+        done
+        
+        if [ ${#missing_files[@]} -gt 0 ]; then
+          echo "Missing files for deployment: ${missing_files[*]}"
+          exit 1
+        fi
+        
+    - name: Check for development artifacts
+      run: |
+        echo "Checking for development artifacts that shouldn't be deployed..."
+        
+        dev_artifacts=(
+          "node_modules/"
+          ".env"
+          ".env.local"
+          ".env.development"
+          "*.log"
+          "npm-debug.log*"
+          "yarn-debug.log*"
+          "yarn-error.log*"
+          ".nyc_output"
+          "coverage/"
+          ".tmp/"
+          "temp/"
+        )
+        
+        found_artifacts=()
+        for artifact in "${dev_artifacts[@]}"; do
+          if find . -name "$artifact" -not -path "./.git/*" | grep -q .; then
+            echo "⚠️  Found development artifact: $artifact"
+            found_artifacts+=("$artifact")
+          fi
+        done
+        
+        if [ ${#found_artifacts[@]} -gt 0 ]; then
+          echo "Development artifacts found (should be in .gitignore):"
+          printf '%s\n' "${found_artifacts[@]}"
+          # Don't fail, just warn for now
+        fi
+        
+    - name: Validate production URLs
+      run: |
+        echo "Validating URLs for production..."
+        
+        # Check for localhost URLs that need to be updated for production
+        localhost_files=()
+        for file in $(find . -name "*.html" -o -name "*.js" -o -name "*.css"); do
+          if grep -q "localhost\|127.0.0.1" "$file"; then
+            echo "⚠️  $file contains localhost URLs"
+            localhost_files+=("$file")
+          fi
+        done
+        
+        if [ ${#localhost_files[@]} -gt 0 ]; then
+          echo "Files with localhost URLs (may need production URLs):"
+          printf '%s\n' "${localhost_files[@]}"
+          # Don't fail, just warn as localhost might be intentional for development
+        fi
+        
+    - name: Check asset optimization
+      run: |
+        echo "Checking asset optimization..."
+        
+        # Check for large images that might need optimization
+        large_images=()
+        max_size=500000  # 500KB
+        
+        for file in $(find . -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.gif"); do
+          if [ -f "$file" ]; then
+            size=$(stat -c%s "$file")
+            if [ $size -gt $max_size ]; then
+              size_kb=$((size / 1024))
+              echo "⚠️  Large image: $file (${size_kb}KB)"
+              large_images+=("$file")
+            fi
+          fi
+        done
+        
+        if [ ${#large_images[@]} -gt 0 ]; then
+          echo "Consider optimizing these images for better performance:"
+          printf '%s\n' "${large_images[@]}"
+        fi
+        
+    - name: Performance check
+      run: |
+        echo "Running basic performance checks..."
+        
+        # Count total number of HTTP requests that would be made
+        total_requests=0
+        
+        for file in *.html; do
+          if [ -f "$file" ]; then
+            echo "Analyzing $file..."
+            
+            # Count CSS files
+            css_count=$(grep -o '<link.*\.css' "$file" | wc -l)
+            echo "  CSS files: $css_count"
+            
+            # Count JS files
+            js_count=$(grep -o '<script.*\.js' "$file" | wc -l)
+            echo "  JS files: $js_count"
+            
+            # Count images
+            img_count=$(grep -o '<img' "$file" | wc -l)
+            echo "  Images: $img_count"
+            
+            # Count external resources
+            external_count=$(grep -o 'https://.*\.' "$file" | wc -l)
+            echo "  External resources: $external_count"
+            
+            file_total=$((css_count + js_count + img_count + external_count))
+            echo "  Total requests for $file: $file_total"
+            total_requests=$((total_requests + file_total))
+          fi
+        done
+        
+        echo "Estimated total HTTP requests across all pages: $total_requests"
+        
+        if [ $total_requests -gt 50 ]; then
+          echo "⚠️  High number of HTTP requests may impact performance"
+          echo "Consider bundling CSS/JS files or using a CDN"
+        else
+          echo "✅ Reasonable number of HTTP requests"
+        fi
+
+  browser-compatibility:
+    name: Browser Compatibility Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check CSS browser compatibility
+      run: |
+        echo "Checking CSS for browser compatibility issues..."
+        
+        # Check for CSS features that might need vendor prefixes
+        compatibility_issues=()
+        
+        for file in css/*.css; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            
+            # Check for flexbox without prefixes
+            if grep -q "display:\s*flex" "$file" && ! grep -q "\-webkit\-flex\|\-ms\-flexbox" "$file"; then
+              echo "ℹ️  $file uses flexbox - consider vendor prefixes for older browsers"
+            fi
+            
+            # Check for grid without prefixes
+            if grep -q "display:\s*grid" "$file" && ! grep -q "\-ms\-grid" "$file"; then
+              echo "ℹ️  $file uses CSS Grid - may not work in older browsers"
+            fi
+            
+            # Check for CSS variables
+            if grep -q "\-\-" "$file"; then
+              echo "ℹ️  $file uses CSS variables - not supported in IE"
+            fi
+            
+            # Check for transforms without prefixes
+            if grep -q "transform:" "$file" && ! grep -q "\-webkit\-transform\|\-moz\-transform" "$file"; then
+              echo "ℹ️  $file uses transform - consider vendor prefixes"
+            fi
+          fi
+        done
+        
+    - name: Check JavaScript browser compatibility
+      run: |
+        echo "Checking JavaScript for browser compatibility..."
+        
+        for file in js/*.js; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            
+            # Check for ES6+ features
+            if grep -q "const\s\|let\s" "$file"; then
+              echo "ℹ️  $file uses ES6 const/let - may need transpilation for older browsers"
+            fi
+            
+            if grep -q "=>" "$file"; then
+              echo "ℹ️  $file uses arrow functions - may need transpilation for IE"
+            fi
+            
+            if grep -q "async\|await" "$file"; then
+              echo "ℹ️  $file uses async/await - may need polyfill for older browsers"
+            fi
+            
+            if grep -q "fetch(" "$file"; then
+              echo "ℹ️  $file uses fetch API - may need polyfill for IE"
+            fi
+          fi
+        done
+
+  seo-check:
+    name: SEO and Meta Tags Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check HTML meta tags
+      run: |
+        echo "Checking HTML meta tags for SEO..."
+        
+        html_files=("index.html" "bazi.html" "report.html" "test-cases.html")
+        
+        for file in "${html_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            
+            # Check for title tag
+            if grep -q "<title>" "$file"; then
+              title=$(grep -o '<title>.*</title>' "$file" | head -1)
+              echo "✅ $file has title: $title"
+            else
+              echo "⚠️  $file missing title tag"
+            fi
+            
+            # Check for meta description
+            if grep -q 'name="description"' "$file"; then
+              echo "✅ $file has meta description"
+            else
+              echo "⚠️  $file missing meta description"
+            fi
+            
+            # Check for meta keywords (optional)
+            if grep -q 'name="keywords"' "$file"; then
+              echo "✅ $file has meta keywords"
+            fi
+            
+            # Check for viewport meta tag
+            if grep -q 'name="viewport"' "$file"; then
+              echo "✅ $file has viewport meta tag"
+            else
+              echo "⚠️  $file missing viewport meta tag"
+            fi
+            
+            # Check for charset
+            if grep -q 'charset=' "$file"; then
+              echo "✅ $file has charset declaration"
+            else
+              echo "⚠️  $file missing charset declaration"
+            fi
+            
+            echo "---"
+          fi
+        done
+        
+        echo "✅ SEO check completed"
