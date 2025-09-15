@@ -26,8 +26,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // 原有的表單提交處理保留作為備用
 document.getElementById("bazi-form").addEventListener("submit", async (e) => {
-  e.preventDefault()
-  const form = new FormData(e.target)
+  e.preventDefault();
+  const form = new FormData(e.target);
   const input = {
     year: parseInt(form.get("yyyy")),
     month: parseInt(form.get("mm")),

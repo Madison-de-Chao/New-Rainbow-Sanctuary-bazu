@@ -10,7 +10,7 @@ const SHENSHA_EFFECTS = {
     category: "吉神"
   },
   "文昌": {
-    effect: "學習能力、文采出眾", 
+    effect: "學習能力、文采出眾",
     description: "聰明好學，文思敏捷，在學業和文字工作方面有特殊天賦。",
     category: "吉神"
   },
@@ -34,7 +34,7 @@ const SHENSHA_EFFECTS = {
     description: "品格高尚，才華橫溢，容易受到他人尊敬和愛戴。",
     category: "吉神"
   },
-  
+
   // 桃花類
   "桃花": {
     effect: "人緣魅力、社交順利",
@@ -51,7 +51,7 @@ const SHENSHA_EFFECTS = {
     description: "生活中喜事較多，心情愉快，容易遇到值得慶祝的事情。",
     category: "桃花"
   },
-  
+
   // 動星類
   "驛馬": {
     effect: "奔波變動、機動力強",
@@ -63,7 +63,7 @@ const SHENSHA_EFFECTS = {
     description: "具有領導天賦，能夠統領他人，適合管理和指揮工作。",
     category: "動星"
   },
-  
+
   // 凶煞
   "空亡": {
     effect: "變化無常、需要適應",
@@ -100,16 +100,16 @@ function calculateTianyiGuiren(dayGan, pillars) {
     "丙": ["亥", "酉"], "丁": ["亥", "酉"],
     "壬": ["卯", "巳"], "癸": ["卯", "巳"]
   };
-  
+
   const targetZhi = map[dayGan] || [];
   const foundPillars = [];
-  
+
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (targetZhi.includes(pillar.zhi)) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "天乙貴人",
     pillars: foundPillars,
@@ -121,21 +121,21 @@ function calculateTianyiGuiren(dayGan, pillars) {
 function calculateTaohua(yearZhi, pillars) {
   const map = {
     "申": "酉", "子": "酉", "辰": "酉",
-    "寅": "卯", "午": "卯", "戌": "卯", 
+    "寅": "卯", "午": "卯", "戌": "卯",
     "巳": "午", "酉": "午", "丑": "午",
     "亥": "子", "卯": "子", "未": "子"
   };
-  
+
   const taohuaZhi = map[yearZhi];
   if (!taohuaZhi) return null;
-  
+
   const foundPillars = [];
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (pillar.zhi === taohuaZhi) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "桃花",
     pillars: foundPillars,
@@ -151,17 +151,17 @@ function calculateYima(yearZhi, pillars) {
     "巳": "亥", "酉": "亥", "丑": "亥",
     "亥": "巳", "卯": "巳", "未": "巳"
   };
-  
+
   const yimaZhi = map[yearZhi];
   if (!yimaZhi) return null;
-  
+
   const foundPillars = [];
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (pillar.zhi === yimaZhi) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "驛馬",
     pillars: foundPillars,
@@ -175,17 +175,17 @@ function calculateWenchang(yearGan, pillars) {
     "甲": "巳", "乙": "午", "丙": "申", "丁": "酉", "戊": "申",
     "己": "酉", "庚": "亥", "辛": "子", "壬": "寅", "癸": "卯"
   };
-  
+
   const wenchangZhi = map[yearGan];
   if (!wenchangZhi) return null;
-  
+
   const foundPillars = [];
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (pillar.zhi === wenchangZhi) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "文昌",
     pillars: foundPillars,
@@ -201,17 +201,17 @@ function calculateHuagai(yearZhi, pillars) {
     "巳": "丑", "酉": "丑", "丑": "丑",
     "亥": "未", "卯": "未", "未": "未"
   };
-  
+
   const huagaiZhi = map[yearZhi];
   if (!huagaiZhi) return null;
-  
+
   const foundPillars = [];
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (pillar.zhi === huagaiZhi) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "華蓋",
     pillars: foundPillars,
@@ -238,17 +238,17 @@ function calculateKongwang(dayPillar, pillars) {
     "壬子": ["寅", "卯"], "壬戌": ["子", "丑"], "癸酉": ["戌", "亥"], "癸未": ["申", "酉"],
     "癸巳": ["午", "未"], "癸卯": ["辰", "巳"], "癸丑": ["寅", "卯"], "癸亥": ["子", "丑"]
   };
-  
+
   const kongwangZhi = kongwangMap[dayPillar];
   if (!kongwangZhi) return null;
-  
+
   const foundPillars = [];
   Object.entries(pillars).forEach(([pillarName, pillar]) => {
     if (kongwangZhi.includes(pillar.zhi)) {
       foundPillars.push(pillarName);
     }
   });
-  
+
   return foundPillars.length > 0 ? {
     name: "空亡",
     pillars: foundPillars,
@@ -263,28 +263,28 @@ function calculateAllShensha(pillars) {
   const dayPillar = day.gan + day.zhi;
   const yearZhi = year.zhi;
   const yearGan = year.gan;
-  
+
   const shenshaList = [];
-  
+
   // 計算各種神煞
   const tianyiGuiren = calculateTianyiGuiren(dayGan, pillars);
   if (tianyiGuiren) shenshaList.push(tianyiGuiren);
-  
+
   const taohua = calculateTaohua(yearZhi, pillars);
   if (taohua) shenshaList.push(taohua);
-  
+
   const yima = calculateYima(yearZhi, pillars);
   if (yima) shenshaList.push(yima);
-  
+
   const wenchang = calculateWenchang(yearGan, pillars);
   if (wenchang) shenshaList.push(wenchang);
-  
+
   const huagai = calculateHuagai(yearZhi, pillars);
   if (huagai) shenshaList.push(huagai);
-  
+
   const kongwang = calculateKongwang(dayPillar, pillars);
   if (kongwang) shenshaList.push(kongwang);
-  
+
   return shenshaList.length > 0 ? shenshaList : [{
     name: "（本盤暫無核心神煞）",
     effect: "平穩發展",
@@ -297,9 +297,9 @@ function calculateAllShensha(pillars) {
 // 格式化神煞信息用於顯示
 function formatShenshaForDisplay(shenshaList) {
   return shenshaList.map(shensha => {
-    const pillarText = shensha.pillars.length > 0 ? 
+    const pillarText = shensha.pillars.length > 0 ?
       ` (出現在${shensha.pillars.join('、')}柱)` : '';
-    
+
     return {
       name: shensha.name,
       effect: shensha.effect,
@@ -315,4 +315,3 @@ function formatShenshaForDisplay(shenshaList) {
 window.calculateAllShensha = calculateAllShensha;
 window.formatShenshaForDisplay = formatShenshaForDisplay;
 window.SHENSHA_EFFECTS = SHENSHA_EFFECTS;
-

@@ -441,4 +441,3 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
 function exportReport() {
   window.location.href = "report.html";
 }
-

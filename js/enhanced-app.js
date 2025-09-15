@@ -37,9 +37,9 @@ let rendering = false;
 
 // D. 安全的localStorage包裝
 const storage = (() => {
-  try { 
-    return window.localStorage; 
-  } catch { 
+  try {
+    return window.localStorage;
+  } catch {
     const mem = {};
     return {
       getItem: k => mem[k] ?? null,
@@ -51,14 +51,14 @@ const storage = (() => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Enhanced app loaded");
-  
+
   // 綁定表單提交事件
   const form = document.getElementById('bazi-form');
   if (form) {
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       console.log('Form submitted');
-      
+
       // 收集表單數據
       const formData = new FormData(form);
       const data = {
@@ -70,39 +70,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         hour: parseInt(formData.get('hh')),
         zMode: formData.get('zMode') || 'none'
       };
-      
+
       console.log('Form data:', data);
-      
+
       // 顯示載入動畫
       showLoadingAnimation();
-      
+
       try {
         // 調用後端API
         const result = await getFullBaziAnalysis(data);
         console.log('API result:', result);
-        
+
         // 顯示結果區域
         const resultSection = document.getElementById('result');
         if (resultSection) {
           resultSection.style.display = 'block';
         }
-        
+
         // 渲染結果
         await renderEnhancedResultsOnce(result);
-        
+
         // 保存數據
         storage.setItem('baziAnalysis', JSON.stringify(result));
         storage.setItem('birthData', JSON.stringify(data));
-        
+
       } catch (error) {
         console.error('Error:', error);
         alert('計算失敗，請稍後再試');
       }
-      
+
       hideLoadingAnimation();
     });
   }
-  
+
   // 載入保存的數據到表單
   const savedData = storage.getItem('birthData');
   if (savedData) {
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const monthInput = document.querySelector('input[name="mm"]');
       const dayInput = document.querySelector('input[name="dd"]');
       const hourInput = document.querySelector('input[name="hh"]');
-      
+
       if (userNameInput && data.userName) userNameInput.value = data.userName;
       if (genderSelect && data.gender) genderSelect.value = data.gender;
       if (yearInput && data.year) yearInput.value = data.year;
@@ -125,16 +125,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error('Error loading saved data:', error);
     }
   }
-});
-      console.error("解析出生資料失敗:", error);
-    }
-  }
-  
+
+  // Check for cached analysis data
+  const baziAnalysis = storage.getItem("baziAnalysis");
   if (baziAnalysis) {
     try {
       const data = JSON.parse(baziAnalysis);
       console.log("Found cached data:", data);
-      
+
       if (data.chart && data.narrative) {
         await renderEnhancedResultsOnce(data);
       } else {
@@ -179,7 +177,7 @@ function getRichDemoAnalysis(birthData, tone = "default") {
   };
 
   const currentTone = toneStyles[tone] || toneStyles.default;
-  
+
   return {
     chart: {
       pillars: {
@@ -228,14 +226,14 @@ async function generateFreshData() {
     day: 6,
     hour: 20
   };
-  
+
   const tone = storage.getItem("tone") || "default";
-  
+
   try {
     console.log("Calling API with data:", birthData);
     const result = await getFullBaziAnalysis(birthData, tone);
     console.log("API returned:", result);
-    
+
     storage.setItem("baziAnalysis", JSON.stringify(result));
     await renderEnhancedResultsOnce(result);
   } catch (error) {
@@ -251,23 +249,23 @@ async function renderEnhancedResultsOnce(data) {
     console.log("Already rendering, skipping...");
     return;
   }
-  
+
   rendering = true;
   try {
     console.log("Rendering enhanced results...");
-    
+
     // 渲染四柱卡片 - 添加飛入動畫
     await renderAnimatedPillars(data.chart.pillars);
-    
+
     // 渲染五行圖表 - 使用安全的Chart.js渲染
     await renderSafeFiveElementsChart(data.chart.fiveElements);
-    
+
     // 渲染敘事內容 - 添加打字機效果
     await renderAnimatedNarrative(data.narrative);
-    
+
     // 渲染陰陽統計
     renderYinYang(data.chart.yinYang);
-    
+
     // 計算並顯示神煞信息
     if (window.calculateAllShensha && data.chart && data.chart.pillars) {
       const pillars = {
@@ -276,12 +274,12 @@ async function renderEnhancedResultsOnce(data) {
         日: { gan: data.chart.pillars.日.gan, zhi: data.chart.pillars.日.zhi },
         時: { gan: data.chart.pillars.時.gan, zhi: data.chart.pillars.時.zhi }
       };
-      
+
       const shenshaList = window.calculateAllShensha(pillars);
       const formattedShensha = window.formatShenshaForDisplay(shenshaList);
       renderShenshaInfo(formattedShensha);
     }
-    
+
     // 添加神煞信息（如果有）
     if (data.spirits && data.spirits.length > 0) {
       renderSpirits(data.spirits);
@@ -297,15 +295,15 @@ async function renderEnhancedResultsOnce(data) {
 async function renderAnimatedPillars(pillars) {
   const pillarsElement = ensureElement("#pillars", "pillars");
   pillarsElement.innerHTML = "";
-  
+
   const pillarNames = ["年", "月", "日", "時"];
   const colors = ["#ff6ec4", "#7873f5", "#00d4ff", "#ff9500"];
-  
+
   for (let i = 0; i < pillarNames.length; i++) {
     const pillarName = pillarNames[i];
     const pillar = pillars[pillarName];
     if (!pillar) continue;
-    
+
     const card = document.createElement("div");
     card.className = "pillar-card";
     card.style.cssText = `
@@ -321,7 +319,7 @@ async function renderAnimatedPillars(pillars) {
       backdrop-filter: blur(10px);
       margin-bottom: 1rem;
     `;
-    
+
     card.innerHTML = `
       <div style="font-size: 1.2rem; color: ${colors[i]}; font-weight: bold; margin-bottom: 0.5rem;">
         ${pillarName}柱軍團
@@ -333,15 +331,15 @@ async function renderAnimatedPillars(pillars) {
         天干：${pillar.gan} | 地支：${pillar.zhi}
       </div>
     `;
-    
+
     pillarsElement.appendChild(card);
-    
+
     // 延遲動畫以創建飛入效果
     setTimeout(() => {
       card.style.transform = "translateY(0) scale(1)";
       card.style.opacity = "1";
     }, i * 200);
-    
+
     await new Promise(resolve => setTimeout(resolve, 200));
   }
 }
@@ -352,7 +350,7 @@ async function renderSafeFiveElementsChart(fiveElements) {
     console.warn("Chart.js not loaded");
     return;
   }
-  
+
   const config = {
     type: "radar",
     data: {
@@ -405,7 +403,7 @@ async function renderSafeFiveElementsChart(fiveElements) {
       }
     }
   };
-  
+
   // 使用安全的Chart.js渲染函數
   const chart = renderAnimatedChart("fiveChart", config);
   if (chart) {
@@ -417,15 +415,15 @@ async function renderSafeFiveElementsChart(fiveElements) {
 async function renderAnimatedNarrative(narrative) {
   const narrativeElement = ensureElement("#narrative", "narrative");
   narrativeElement.innerHTML = "";
-  
+
   const pillarNames = ["年", "月", "日", "時"];
   const colors = ["#ff6ec4", "#7873f5", "#00d4ff", "#ff9500"];
-  
+
   for (let i = 0; i < pillarNames.length; i++) {
     const pillarName = pillarNames[i];
     const data = narrative[pillarName];
     if (!data) continue;
-    
+
     const card = document.createElement("div");
     card.className = "narrative-card";
     card.style.cssText = `
@@ -440,7 +438,7 @@ async function renderAnimatedNarrative(narrative) {
       transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 8px 32px ${colors[i]}10;
     `;
-    
+
     card.innerHTML = `
       <h3 style="color: ${colors[i]}; margin-bottom: 1rem; font-size: 1.5rem;">
         ${pillarName}柱 · ${data.commander || data.title || '守護者'}
@@ -453,15 +451,15 @@ async function renderAnimatedNarrative(narrative) {
         ${data.story || data.description || '暫無描述'}
       </p>
     `;
-    
+
     narrativeElement.appendChild(card);
-    
+
     // 延遲動畫
     setTimeout(() => {
       card.style.transform = "translateX(0)";
       card.style.opacity = "1";
     }, i * 300);
-    
+
     await new Promise(resolve => setTimeout(resolve, 300));
   }
 }
@@ -469,21 +467,21 @@ async function renderAnimatedNarrative(narrative) {
 // 安全的陰陽統計渲染
 function renderYinYang(yinYang) {
   const yinYangElement = ensureElement("#yinyang", "yinyang");
-  
+
   // 處理不同的數據結構
   let yinCount = 0, yangCount = 0;
-  
+
   if (yinYang && typeof yinYang === 'object') {
     yinCount = yinYang.yin || yinYang.陰 || 0;
     yangCount = yinYang.yang || yinYang.陽 || 0;
   }
-  
+
   // 如果沒有數據，使用默認值
   if (yinCount === 0 && yangCount === 0) {
     yinCount = 3;
     yangCount = 4;
   }
-  
+
   yinYangElement.innerHTML = `
     <div style="display: flex; justify-content: center; gap: 2rem; align-items: center;">
       <div style="text-align: center;">
@@ -501,12 +499,12 @@ function renderYinYang(yinYang) {
 // 安全的神煞信息渲染
 function renderSpirits(spirits) {
   const shenshaElement = ensureElement("#shensha-info", "shensha-info");
-  
+
   if (!spirits || spirits.length === 0) {
     shenshaElement.innerHTML = '<div style="color: #888;">暫無神煞信息</div>';
     return;
   }
-  
+
   const spiritsCard = document.createElement("div");
   spiritsCard.className = "spirits-card";
   spiritsCard.style.cssText = `
@@ -517,7 +515,7 @@ function renderSpirits(spirits) {
     margin-top: 2rem;
     backdrop-filter: blur(10px);
   `;
-  
+
   // 處理神煞數據，確保正確顯示
   let spiritsContent = '';
   if (Array.isArray(spirits)) {
@@ -533,14 +531,14 @@ function renderSpirits(spirits) {
   } else {
     spiritsContent = `<div style="margin-bottom: 0.5rem;">• ${spirits}</div>`;
   }
-  
+
   spiritsCard.innerHTML = `
     <h3 style="color: #ffd700; margin-bottom: 1rem; font-size: 1.5rem;">神煞信息</h3>
     <div style="color: #ccc; line-height: 1.6;">
       ${spiritsContent}
     </div>
   `;
-  
+
   shenshaElement.innerHTML = '';
   shenshaElement.appendChild(spiritsCard);
 }
@@ -551,7 +549,7 @@ function showLoadingAnimation() {
   if (document.getElementById("loading-animation")) {
     return;
   }
-  
+
   const loadingDiv = document.createElement("div");
   loadingDiv.id = "loading-animation";
   loadingDiv.style.cssText = `
@@ -567,16 +565,16 @@ function showLoadingAnimation() {
     z-index: 9999;
     backdrop-filter: blur(10px);
   `;
-  
+
   loadingDiv.innerHTML = `
     <div style="text-align: center;">
       <div style="width: 60px; height: 60px; border: 4px solid rgba(255, 110, 196, 0.3); border-top: 4px solid #ff6ec4; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
       <div style="color: #ff6ec4; font-size: 1.2rem;">召喚你的軍團中...</div>
     </div>
   `;
-  
+
   document.body.appendChild(loadingDiv);
-  
+
   // 添加旋轉動畫（避免重複添加）
   if (!document.getElementById("loading-animation-style")) {
     const style = document.createElement("style");
@@ -610,7 +608,7 @@ function hideLoadingAnimation() {
 document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   showLoadingAnimation();
-  
+
   const form = new FormData(e.target);
   const input = {
     year: parseInt(form.get("yyyy")),
@@ -618,12 +616,12 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
     day: parseInt(form.get("dd")),
     hour: parseInt(form.get("hh"))
   };
-  
+
   // 保存表單數據到localStorage
   storage.setItem("birthData", JSON.stringify(input));
-  
+
   const tone = storage.getItem("tone") || "default";
-  
+
   try {
     const analysisData = await getFullBaziAnalysis(input, tone);
     storage.setItem("baziAnalysis", JSON.stringify(analysisData));
@@ -633,7 +631,7 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
     const demoData = getDemoAnalysis(input, tone);
     await renderEnhancedResultsOnce(demoData);
   }
-  
+
   hideLoadingAnimation();
 });
 
@@ -646,7 +644,7 @@ function exportReport() {
 // 渲染神煞信息
 function renderShenshaInfo(shenshaList) {
   const narrativeElement = ensureElement("#narrative", "narrative");
-  
+
   const shenshaCard = document.createElement("div");
   shenshaCard.className = "shensha-card";
   shenshaCard.style.cssText = `
@@ -660,19 +658,19 @@ function renderShenshaInfo(shenshaList) {
     opacity: 0;
     transition: all 0.6s ease;
   `;
-  
+
   const shenshaContent = shenshaList.map(shensha => {
     const categoryColor = {
       '吉神': '#4ade80',
-      '桃花': '#f472b6', 
+      '桃花': '#f472b6',
       '動星': '#60a5fa',
       '凶煞': '#f87171',
       '中性': '#a3a3a3'
     }[shensha.category] || '#ffd700';
-    
-    const pillarText = shensha.pillars.length > 0 ? 
+
+    const pillarText = shensha.pillars.length > 0 ?
       ` <span style="color: ${categoryColor}; font-size: 0.9rem;">(${shensha.pillars.join('、')}柱)</span>` : '';
-    
+
     return `
       <div style="margin-bottom: 1rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; border-left: 4px solid ${categoryColor};">
         <div style="color: ${categoryColor}; font-weight: bold; margin-bottom: 0.5rem;">
@@ -687,7 +685,7 @@ function renderShenshaInfo(shenshaList) {
       </div>
     `;
   }).join('');
-  
+
   shenshaCard.innerHTML = `
     <h3 style="color: #ffd700; margin-bottom: 1.5rem; font-size: 1.5rem; text-align: center;">
       🔮 神煞信息
@@ -696,9 +694,9 @@ function renderShenshaInfo(shenshaList) {
       ${shenshaContent}
     </div>
   `;
-  
+
   narrativeElement.appendChild(shenshaCard);
-  
+
   // 延遲動畫
   setTimeout(() => {
     shenshaCard.style.transform = "translateY(0)";
