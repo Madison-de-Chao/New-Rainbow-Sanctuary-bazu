@@ -45,12 +45,32 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // 生成新的八字數據
 async function generateFreshData() {
-  const birthData = {
-    year: 1984,
-    month: 10,
-    day: 6,
-    hour: 20
-  };
+  // Get stored birth data instead of using hardcoded values
+  const storedBirthData = localStorage.getItem("birthData");
+  let birthData;
+  
+  if (storedBirthData) {
+    try {
+      birthData = JSON.parse(storedBirthData);
+    } catch (error) {
+      console.error("Error parsing stored birth data:", error);
+      // Fallback to default values if parsing fails
+      birthData = {
+        year: 1984,
+        month: 10,
+        day: 6,
+        hour: 20
+      };
+    }
+  } else {
+    // Fallback to default values if no stored data
+    birthData = {
+      year: 1984,
+      month: 10,
+      day: 6,
+      hour: 20
+    };
+  }
   
   const tone = localStorage.getItem("tone") || "default";
   
