@@ -1,0 +1,202 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches: [ main, master ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-checks:
+    name: Pull Request Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for comparison
+        
+    - name: Check PR title format
+      run: |
+        echo "Checking PR title format..."
+        PR_TITLE="${{ github.event.pull_request.title }}"
+        
+        # Check if PR title follows conventional commit format
+        if echo "$PR_TITLE" | grep -qE "^(feat|fix|docs|style|refactor|test|chore)(\(.+\))?: .+"; then
+          echo "✅ PR title follows conventional commit format"
+        else
+          echo "ℹ️  PR title: $PR_TITLE"
+          echo "ℹ️  Consider using conventional commit format: type(scope): description"
+          echo "ℹ️  Examples: feat: add new feature, fix: resolve bug, docs: update README"
+        fi
+        
+    - name: Check for changes in critical files
+      run: |
+        echo "Checking for changes in critical files..."
+        
+        critical_files=(
+          "README.md"
+          "index.html"
+          "package.json"
+          ".gitignore"
+        )
+        
+        changed_files=$(git diff --name-only HEAD^ HEAD)
+        
+        for file in "${critical_files[@]}"; do
+          if echo "$changed_files" | grep -q "^$file$"; then
+            echo "⚠️  Critical file modified: $file"
+            echo "Please ensure changes are necessary and properly reviewed."
+          fi
+        done
+        
+    - name: Check commit messages
+      run: |
+        echo "Checking commit messages..."
+        
+        # Get commit messages for this PR
+        git log --pretty=format:"%s" HEAD^..HEAD | while read -r commit_msg; do
+          echo "Checking commit: $commit_msg"
+          
+          # Check minimum length
+          if [ ${#commit_msg} -lt 10 ]; then
+            echo "❌ Commit message too short (less than 10 characters): $commit_msg"
+            exit 1
+          fi
+          
+          # Check for meaningful content (not just "update" or "fix")
+          if echo "$commit_msg" | grep -qiE "^(update|fix|change)$"; then
+            echo "⚠️  Commit message could be more descriptive: $commit_msg"
+          fi
+          
+          echo "✅ Commit message acceptable: $commit_msg"
+        done
+        
+    - name: Check for merge conflicts
+      run: |
+        echo "Checking for merge conflict markers..."
+        
+        conflict_markers=(
+          "<<<<<<< HEAD"
+          "======="
+          ">>>>>>> "
+        )
+        
+        found_conflicts=false
+        for marker in "${conflict_markers[@]}"; do
+          if grep -r "$marker" . --exclude-dir=.git; then
+            echo "❌ Found merge conflict marker: $marker"
+            found_conflicts=true
+          fi
+        done
+        
+        if [ "$found_conflicts" = true ]; then
+          echo "Please resolve merge conflicts before merging"
+          exit 1
+        fi
+        
+        echo "✅ No merge conflicts detected"
+        
+    - name: Validate changed files
+      run: |
+        echo "Validating changes in modified files..."
+        
+        changed_files=$(git diff --name-only HEAD^ HEAD)
+        
+        for file in $changed_files; do
+          if [ -f "$file" ]; then
+            echo "Validating $file..."
+            
+            # Check HTML files
+            if [[ "$file" == *.html ]]; then
+              if grep -q "<!DOCTYPE" "$file" && grep -q "</html>" "$file"; then
+                echo "✅ $file has proper HTML structure"
+              else
+                echo "❌ $file may have HTML structure issues"
+                exit 1
+              fi
+            fi
+            
+            # Check JavaScript files
+            if [[ "$file" == *.js ]] && command -v node >/dev/null 2>&1; then
+              node -c "$file" || exit 1
+              echo "✅ $file JavaScript syntax is valid"
+            fi
+            
+            # Check JSON files
+            if [[ "$file" == *.json ]] && command -v python3 >/dev/null 2>&1; then
+              python3 -m json.tool "$file" > /dev/null || exit 1
+              echo "✅ $file JSON is valid"
+            fi
+          fi
+        done
+
+  size-check:
+    name: File Size Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check file sizes
+      run: |
+        echo "Checking for large files..."
+        
+        max_size_mb=10
+        max_size_bytes=$((max_size_mb * 1024 * 1024))
+        
+        large_files=()
+        while IFS= read -r -d '' file; do
+          size=$(stat -c%s "$file")
+          if [ $size -gt $max_size_bytes ]; then
+            size_mb=$((size / 1024 / 1024))
+            echo "⚠️  Large file detected: $file (${size_mb}MB)"
+            large_files+=("$file")
+          fi
+        done < <(find . -type f -not -path "./.git/*" -print0)
+        
+        if [ ${#large_files[@]} -gt 0 ]; then
+          echo "Consider optimizing or using Git LFS for large files:"
+          printf '%s\n' "${large_files[@]}"
+          # Don't fail, just warn
+        fi
+        
+        echo "✅ File size check completed"
+
+  dependency-check:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for new dependencies
+      run: |
+        echo "Checking for external dependencies..."
+        
+        # Check for CDN links in HTML files
+        echo "Checking for CDN dependencies in HTML files..."
+        cdn_count=0
+        for file in *.html; do
+          if [ -f "$file" ]; then
+            cdns=$(grep -o 'https://cdn\.' "$file" | wc -l)
+            if [ $cdns -gt 0 ]; then
+              echo "ℹ️  $file contains $cdns CDN references"
+              cdn_count=$((cdn_count + cdns))
+            fi
+          fi
+        done
+        
+        echo "Total CDN references found: $cdn_count"
+        
+        # Check for package.json changes
+        if [ -f "package.json" ]; then
+          echo "ℹ️  package.json exists - checking for dependency changes"
+          # Could add more sophisticated dependency checking here
+        else
+          echo "ℹ️  No package.json found - project appears to use CDN dependencies"
+        fi
+        
+        echo "✅ Dependency check completed"

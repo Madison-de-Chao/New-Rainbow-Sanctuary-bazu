@@ -1,0 +1,267 @@
+name: Branch Protection Checks
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  code-quality-check:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check HTML validity
+      run: |
+        echo "Checking HTML files for basic syntax..."
+        for file in *.html; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            # Basic HTML syntax check
+            if grep -q "<!DOCTYPE" "$file" && grep -q "</html>" "$file"; then
+              echo "✅ $file has proper HTML structure"
+            else
+              echo "❌ $file may have HTML structure issues"
+              exit 1
+            fi
+          fi
+        done
+        
+    - name: Check JavaScript syntax
+      run: |
+        echo "Checking JavaScript files for basic syntax..."
+        if command -v node >/dev/null 2>&1; then
+          for file in js/*.js; do
+            if [ -f "$file" ]; then
+              echo "Checking $file..."
+              node -c "$file" || exit 1
+              echo "✅ $file syntax is valid"
+            fi
+          done
+        else
+          echo "Node.js not available, skipping JS syntax check"
+        fi
+        
+    - name: Check CSS syntax
+      run: |
+        echo "Checking CSS files for basic issues..."
+        for file in css/*.css; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            # Basic CSS bracket matching
+            if [ $(grep -o '{' "$file" | wc -l) -eq $(grep -o '}' "$file" | wc -l) ]; then
+              echo "✅ $file has balanced brackets"
+            else
+              echo "❌ $file may have unbalanced brackets"
+              exit 1
+            fi
+          fi
+        done
+        
+    - name: Check JSON validity
+      run: |
+        echo "Checking JSON files for validity..."
+        for file in $(find . -name "*.json" -not -path "./node_modules/*"); do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            if command -v python3 >/dev/null 2>&1; then
+              python3 -m json.tool "$file" > /dev/null || exit 1
+              echo "✅ $file is valid JSON"
+            else
+              echo "Python3 not available, skipping JSON validation"
+            fi
+          fi
+        done
+
+  file-structure-check:
+    name: File Structure Check  
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Verify required files exist
+      run: |
+        echo "Checking for required project files..."
+        required_files=(
+          "index.html"
+          "bazi.html" 
+          "report.html"
+          "README.md"
+          "css/style.css"
+          "js/app.js"
+          "data/sample.json"
+        )
+        
+        missing_files=()
+        for file in "${required_files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file exists"
+          else
+            echo "❌ $file is missing"
+            missing_files+=("$file")
+          fi
+        done
+        
+        if [ ${#missing_files[@]} -gt 0 ]; then
+          echo "Missing required files: ${missing_files[*]}"
+          exit 1
+        fi
+        
+    - name: Check for sensitive files
+      run: |
+        echo "Checking for accidentally committed sensitive files..."
+        sensitive_patterns=(
+          "*.env"
+          "*.key"
+          "*.pem"
+          "*password*"
+          "*secret*"
+          ".env.*"
+        )
+        
+        found_sensitive=false
+        for pattern in "${sensitive_patterns[@]}"; do
+          if find . -name "$pattern" -not -path "./.git/*" | grep -q .; then
+            echo "❌ Found potentially sensitive files matching pattern: $pattern"
+            find . -name "$pattern" -not -path "./.git/*"
+            found_sensitive=true
+          fi
+        done
+        
+        if [ "$found_sensitive" = true ]; then
+          exit 1
+        fi
+        echo "✅ No sensitive files detected"
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check README completeness
+      run: |
+        echo "Checking README.md completeness..."
+        required_sections=(
+          "專案簡介"
+          "主要功能"
+          "技術架構"
+          "專案結構"
+          "安裝與使用"
+          "貢獻指南"
+        )
+        
+        missing_sections=()
+        for section in "${required_sections[@]}"; do
+          if grep -q "$section" README.md; then
+            echo "✅ README contains section: $section"
+          else
+            echo "❌ README missing section: $section"
+            missing_sections+=("$section")
+          fi
+        done
+        
+        if [ ${#missing_sections[@]} -gt 0 ]; then
+          echo "Missing required README sections: ${missing_sections[*]}"
+          exit 1
+        fi
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for security best practices
+      run: |
+        echo "Checking for basic security issues..."
+        
+        # Check for hardcoded credentials or API keys
+        if grep -r -i "password\s*=" . --exclude-dir=.git --exclude="*.md" | grep -v "placeholder"; then
+          echo "❌ Potential hardcoded password found"
+          exit 1
+        fi
+        
+        if grep -r -i "api[_-]key\s*=" . --exclude-dir=.git --exclude="*.md" | grep -v "placeholder"; then
+          echo "❌ Potential hardcoded API key found"
+          exit 1
+        fi
+        
+        # Check for HTTP URLs that should be HTTPS
+        if grep -r "http://" . --exclude-dir=.git --include="*.js" --include="*.html" | grep -v "localhost\|127.0.0.1"; then
+          echo "⚠️  Found HTTP URLs that might need to be HTTPS"
+          # Don't fail for this, just warn
+        fi
+        
+        echo "✅ Basic security checks passed"
+
+  compatibility-check:
+    name: Browser Compatibility Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Check for modern JavaScript features
+      run: |
+        echo "Checking JavaScript compatibility..."
+        
+        # Check for ES6+ features that might need polyfills
+        modern_features=(
+          "const\s"
+          "let\s"
+          "=>"
+          "async\s"
+          "await\s"
+          "Promise"
+        )
+        
+        for file in js/*.js; do
+          if [ -f "$file" ]; then
+            echo "Checking $file for modern JavaScript features..."
+            for feature in "${modern_features[@]}"; do
+              if grep -q "$feature" "$file"; then
+                echo "ℹ️  $file uses modern feature: $feature"
+              fi
+            done
+          fi
+        done
+        
+        echo "✅ JavaScript compatibility check completed"
+        
+    - name: Check CSS for vendor prefixes
+      run: |
+        echo "Checking CSS for vendor prefixes..."
+        
+        # Look for CSS properties that might need vendor prefixes
+        prefixed_properties=(
+          "transform"
+          "transition"
+          "animation"
+          "gradient"
+          "flex"
+        )
+        
+        for file in css/*.css; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            for property in "${prefixed_properties[@]}"; do
+              if grep -q "$property" "$file"; then
+                echo "ℹ️  $file uses CSS property that may need vendor prefixes: $property"
+              fi
+            done
+          fi
+        done
+        
+        echo "✅ CSS compatibility check completed"
