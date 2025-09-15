@@ -258,11 +258,22 @@ function calculateKongwang(dayPillar, pillars) {
 
 // 主要神煞計算函數
 function calculateAllShensha(pillars) {
-  const { year, month, day, hour } = pillars;
+  // Handle both English and Chinese property names
+  const year = pillars.year || pillars.年;
+  const month = pillars.month || pillars.月;
+  const day = pillars.day || pillars.日;
+  const hour = pillars.hour || pillars.時;
+  
+  // Safety check
+  if (!day || !day.gan) {
+    console.warn('Invalid pillars structure in calculateAllShensha');
+    return [];
+  }
+  
   const dayGan = day.gan;
   const dayPillar = day.gan + day.zhi;
-  const yearZhi = year.zhi;
-  const yearGan = year.gan;
+  const yearZhi = year ? year.zhi : '';
+  const yearGan = year ? year.gan : '';
 
   const shenshaList = [];
 

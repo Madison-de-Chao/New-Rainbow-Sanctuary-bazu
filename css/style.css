@@ -1,10 +1,10 @@
 /* 字體與色彩調性 */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC&display=swap');
+/* Using local fallback fonts instead of Google Fonts */
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Noto Serif TC', serif;
+  font-family: 'Noto Serif TC', 'Microsoft JhengHei', '微軟正黑體', serif;
   background-color: #0f0f1a;
   color: white;
   overflow-x: hidden;
