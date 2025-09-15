@@ -1,4 +1,5 @@
-const API_BASE = "https://rainbow-sanctuary-bazu-production.up.railway.app";
+// 使用安全的全域變數宣告避免重複宣告錯誤
+window.API_BASE = window.API_BASE || "https://rainbow-sanctuary-bazu-production.up.railway.app";
 
 // 呼叫後端 API，取得敘事報告
 async function fetchReport(pillars, tone = "default") {
