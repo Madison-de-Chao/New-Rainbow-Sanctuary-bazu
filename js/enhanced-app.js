@@ -210,8 +210,36 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (loadingElement) {
       loadingElement.innerHTML = `
         <h2 style="color: #ff6ec4;">${message}</h2>
-        <button onclick="goBack()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ff6ec4; color: white; border: none; border-radius: 8px; cursor: pointer;">返回重新輸入</button>
+        <button id="goBackBtn" class="error-back-btn">返回重新輸入</button>
       `;
+      // Attach event listener
+      const btn = loadingElement.querySelector("#goBackBtn");
+      if (btn) {
+        btn.addEventListener("click", function() {
+          if (typeof goBack === "function") {
+            goBack();
+          } else {
+            console.warn("goBack function is not defined");
+          }
+        });
+      }
+      // Inject CSS for the button if not already present
+      if (!document.getElementById("error-back-btn-style")) {
+        const style = document.createElement("style");
+        style.id = "error-back-btn-style";
+        style.textContent = `
+          .error-back-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: #ff6ec4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+          }
+        `;
+        document.head.appendChild(style);
+      }
     }
   }
 });
