@@ -7,9 +7,6 @@ if (window.__APP_BOOTED__) {
 }
 window.__APP_BOOTED__ = true;
 
-// Import constants and functions from individual modules
-// Note: For now, we'll use a gradual approach with global variable protection
-
 // A. Safe global variable declarations with protection
 window.API_BASE = window.API_BASE || "https://rainbow-sanctuary-bazu-production.up.railway.app";
 
@@ -45,30 +42,67 @@ window.GAN_ROLE = window.GAN_ROLE || {
   "癸": { name: "癸水間諜", role: "情報", element: "水", description: "如甘露般的神秘間諜" }
 };
 
-// B. Initialize when DOM is ready
+// B. Dynamically load required scripts in order
+const scripts = [
+  'js/api.js',
+  'js/shensha-calculator.js', 
+  'js/ai-narrative.js',
+  'js/ai-story-generator.js',
+  'js/traditional-bazi-renderer.js',
+  'js/enhanced-app.js'
+];
+
+// C. Load scripts dynamically to control loading order
+async function loadScripts() {
+  for (const src of scripts) {
+    await new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+}
+
+// D. Initialize when DOM is ready and scripts are loaded
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("Enhanced App Entry Point loaded");
   
-  // Wait for all scripts to load
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
-  // Check if the enhanced-app main logic is available
-  if (typeof window.initializeEnhancedApp === 'function') {
-    window.initializeEnhancedApp();
-  } else {
-    console.log("Enhanced app main logic not yet available, will retry...");
-    // Fallback initialization logic here if needed
-  }
-  
-  // Ensure result-container exists
-  const resultContainer = document.getElementById("result-container");
-  if (!resultContainer) {
-    console.warn("result-container not found, creating fallback...");
-    const resultSection = document.getElementById("result");
-    if (resultSection) {
-      const container = document.createElement("div");
-      container.id = "result-container";
-      resultSection.appendChild(container);
+  try {
+    // Load all required scripts
+    await loadScripts();
+    
+    // Wait a bit for scripts to initialize
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Initialize the main app
+    if (typeof window.initializeEnhancedApp === 'function') {
+      window.initializeEnhancedApp();
+    } else {
+      console.warn("Enhanced app initialization function not found");
     }
+    
+    // Ensure result-container exists
+    const resultContainer = document.getElementById("result-container");
+    if (!resultContainer) {
+      console.warn("result-container not found, creating fallback...");
+      const resultSection = document.getElementById("result");
+      if (resultSection) {
+        const container = document.createElement("div");
+        container.id = "result-container";
+        // Move existing content to the container
+        const existingContent = Array.from(resultSection.children).slice(1); // Skip header
+        existingContent.forEach(child => {
+          if (child.id !== 'result-container') {
+            container.appendChild(child);
+          }
+        });
+        resultSection.appendChild(container);
+      }
+    }
+    
+  } catch (error) {
+    console.error("Error loading scripts:", error);
   }
 });
