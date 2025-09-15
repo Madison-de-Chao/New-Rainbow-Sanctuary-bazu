@@ -218,10 +218,10 @@ button[onclick="exportReport()"]:hover {
     opacity: 1;
     transform: translateY(0);
   }
-
+}
 
 /* 響應式設計 */
-@media (max-width: 768px) {
+@media (max-width: 768px) 
   .bazi-container {
     padding: 1rem;
   }
@@ -312,7 +312,7 @@ button[onclick="exportReport()"]:hover {
     transform: scale(1.02);
     box-shadow: 0 0 0 10px rgba(255, 110, 196, 0);
   }
-
+ }
 
 .pillar-card:hover {
   animation: pulse 2s infinite;
@@ -326,7 +326,7 @@ button[onclick="exportReport()"]:hover {
   50% {
     text-shadow: 0 0 20px rgba(255, 110, 196, 0.8), 0 0 30px rgba(255, 110, 196, 0.6);
   }
-
+ }
 
 /* 浮動動畫 */
 @keyframes float {
