@@ -27,4 +27,4 @@ temp/
 Thumbs.db
 
 # Log files
-*.log
+*.log*.backup
