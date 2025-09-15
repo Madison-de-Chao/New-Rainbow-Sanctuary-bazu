@@ -336,11 +336,23 @@ window.addEventListener("DOMContentLoaded", () => {
 
 // 主召喚函式 - 使用資料庫計算
 async function enterSite() {
-  const tone = document.getElementById("tone").value;
-  const y = parseInt(document.getElementById("birth-year").value);
-  const m = parseInt(document.getElementById("birth-month").value);
-  const d = parseInt(document.getElementById("birth-day").value);
-  const h = parseInt(document.getElementById("birth-hour").value);
+  const toneElement = document.getElementById("tone");
+  const yearElement = document.getElementById("birth-year");
+  const monthElement = document.getElementById("birth-month");
+  const dayElement = document.getElementById("birth-day");
+  const hourElement = document.getElementById("birth-hour");
+
+  // Check if elements exist (for compatibility with different pages)
+  if (!toneElement || !yearElement || !monthElement || !dayElement || !hourElement) {
+    console.warn("Birth form elements not found, skipping enterSite function");
+    return;
+  }
+
+  const tone = toneElement.value;
+  const y = parseInt(yearElement.value);
+  const m = parseInt(monthElement.value);
+  const d = parseInt(dayElement.value);
+  const h = parseInt(hourElement.value);
 
   if (!y || !m || !d || isNaN(h)) {
     alert("請完整輸入出生年月日時");

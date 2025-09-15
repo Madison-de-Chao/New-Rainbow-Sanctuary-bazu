@@ -19,12 +19,7 @@ window.TEN_GOD_NARRATIVE ??= {
   "七殺":"行動果決、承壓挑戰","正官":"紀律責任、制度資源"
 };
 
-// 神煞效果 (簡化版用於故事生成)
-const SHENSHA_SIMPLE_EFFECTS = {
-  "天乙貴人":"逢兇化吉、得貴相助","桃花":"人緣魅力、社交順利","驛馬":"奔波變動、機動力強",
-  "文昌":"學習能力、文采出眾","華蓋":"藝術天賦、獨特品味","金輿":"財富運勢、物質豐富",
-  "空亡":"變化無常、需要適應","羊刃":"行動力強、需要節制","沖煞":"衝突挑戰、突破機會"
-};
+
 
 // 生成AI故事的提示詞模板
 function generateStoryPrompt(pillarKey, pillarData, userData = {}) {
@@ -34,7 +29,7 @@ function generateStoryPrompt(pillarKey, pillarData, userData = {}) {
   const commanderTitle = GAN_ROLE[stem] || stem;
   const strategistTitle = ZHI_ROLE[branch] || branch;
   const tenGodDesc = TEN_GOD_NARRATIVE[tenGod] || tenGod;
-  const shenshaDesc = shensha.map(s => SHENSHA_SIMPLE_EFFECTS[s] || s).join('、');
+
   
   const pillarDomains = {
     "年": "家族脈絡與社會舞台",
