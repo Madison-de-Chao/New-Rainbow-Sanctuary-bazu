@@ -128,21 +128,91 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Load existing analysis data from storage
   const baziAnalysis = storage.getItem("baziAnalysis");
+  const birthData = storage.getItem("birthData");
+  
   if (baziAnalysis) {
     try {
       const data = JSON.parse(baziAnalysis);
       console.log("Found cached data:", data);
 
       if (data.chart && data.narrative) {
+        // Hide loading and show results
+        hideLoadingScreen();
+        showResultSection();
         await renderEnhancedResultsOnce(data);
       } else {
         console.log("Incomplete data, will generate when user submits");
+        await processStoredBirthData();
       }
     } catch (error) {
       console.error("Error parsing cached data:", error);
+      await processStoredBirthData();
     }
+  } else if (birthData) {
+    console.log("No cached analysis data, but found birth data. Processing...");
+    await processStoredBirthData();
   } else {
     console.log("No cached data, waiting for user input...");
+    hideLoadingScreen();
+  }
+
+  // Process stored birth data if available
+  async function processStoredBirthData() {
+    const storedBirthData = storage.getItem("birthData");
+    const tone = storage.getItem("tone") || "default";
+    
+    if (storedBirthData) {
+      try {
+        const birthDataObj = JSON.parse(storedBirthData);
+        console.log("Processing birth data:", birthDataObj);
+        
+        // Get fresh analysis
+        const analysisData = await getFullBaziAnalysis(birthDataObj, tone);
+        
+        // Store the analysis
+        storage.setItem("baziAnalysis", JSON.stringify(analysisData));
+        
+        // Hide loading and show results
+        hideLoadingScreen();
+        showResultSection();
+        
+        // Render results
+        await renderEnhancedResultsOnce(analysisData);
+        
+      } catch (error) {
+        console.error("Error processing birth data:", error);
+        // Show error and allow user to try again
+        hideLoadingScreen();
+        showErrorMessage("計算失敗，請返回重新輸入");
+      }
+    } else {
+      hideLoadingScreen();
+    }
+  }
+
+  // Helper functions for UI state management
+  function hideLoadingScreen() {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "none";
+    }
+  }
+
+  function showResultSection() {
+    const resultElement = document.getElementById("result");
+    if (resultElement) {
+      resultElement.style.display = "block";
+    }
+  }
+
+  function showErrorMessage(message) {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.innerHTML = `
+        <h2 style="color: #ff6ec4;">${message}</h2>
+        <button onclick="goBack()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #ff6ec4; color: white; border: none; border-radius: 8px; cursor: pointer;">返回重新輸入</button>
+      `;
+    }
   }
 });
 
@@ -637,6 +707,16 @@ document.getElementById("bazi-form")?.addEventListener("submit", async (e) => {
 
 function exportReport() {
   window.location.href = "report.html";
+}
+
+// Go back to the main form
+function goBack() {
+  // Clear stored data
+  storage.removeItem("baziAnalysis");
+  storage.removeItem("birthData");
+  
+  // Redirect to main page
+  window.location.href = "index.html";
 }
 
 
