@@ -331,16 +331,7 @@ class AIStoryGenerator {
     return stories[pillarData.position] || stories.日;
   }
 
-  // 獲取人生階段描述
-  getLifeStage(position) {
-    const stages = {
-      年: '童年與家族根源',
-      月: '青年與事業發展',
-      日: '核心本質與自我',
-      時: '晚年與傳承智慧'
-    };
-    return stages[position] || '人生階段';
-  }
+
 
   // 設置API密鑰
   setApiKey(apiKey) {
