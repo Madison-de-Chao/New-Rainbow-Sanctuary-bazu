@@ -1,0 +1,29 @@
+{
+  "name": "new-rainbow-sanctuary-bazu",
+  "version": "1.0.0",
+  "description": "Rainbow Sanctuary Bazu - A modern Ba Zi (八字) fortune telling web application",
+  "main": "index.html",
+  "scripts": {
+    "syntax-check": "node scripts/check-js-syntax.js",
+    "test": "npm run syntax-check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Madison-de-Chao/New-Rainbow-Sanctuary-bazu.git"
+  },
+  "keywords": [
+    "bazi",
+    "fortune-telling",
+    "chinese-astrology",
+    "web-app"
+  ],
+  "author": "Madison-de-Chao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Madison-de-Chao/New-Rainbow-Sanctuary-bazu/issues"
+  },
+  "homepage": "https://github.com/Madison-de-Chao/New-Rainbow-Sanctuary-bazu#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
