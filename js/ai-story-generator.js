@@ -17,7 +17,7 @@ class AIStoryGenerator {
         enabled: true, // 本地生成始終可用
         advanced: true
       }
-    };
+    }
     
     this.currentService = 'local'; // 默認使用本地生成
   }
@@ -28,10 +28,10 @@ class AIStoryGenerator {
       this.aiServices[service].apiKey = apiKey;
       this.currentService = service;
     }
-  }
+  };
 
   // 生成150字豐富故事 - 主入口
-  async generateRichStory(pillarData, tone = 'default') {
+  async generateRichStory(pillarData, tone = 'default')
     const { position, gan, zhi, naYin } = pillarData;
     
     // 嘗試使用AI服務
