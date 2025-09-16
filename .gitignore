@@ -27,4 +27,9 @@ temp/
 Thumbs.db
 
 # Log files
-*.log*.backup
+*.log
+*.backup
+
+# npm and package files (created during CI)
+package.json
+package-lock.json

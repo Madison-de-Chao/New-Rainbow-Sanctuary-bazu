@@ -15,6 +15,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+      
     - name: Check HTML validity
       run: |
         echo "Checking HTML files for basic syntax..."
@@ -34,17 +39,17 @@ jobs:
     - name: Check JavaScript syntax
       run: |
         echo "Checking JavaScript files for basic syntax..."
-        if command -v node >/dev/null 2>&1; then
-          for file in js/*.js; do
-            if [ -f "$file" ]; then
-              echo "Checking $file..."
-              node -c "$file" || exit 1
+        for file in js/*.js; do
+          if [ -f "$file" ]; then
+            echo "Checking $file..."
+            if node -c "$file"; then
               echo "✅ $file syntax is valid"
+            else
+              echo "❌ $file has syntax errors"
+              exit 1
             fi
-          done
-        else
-          echo "Node.js not available, skipping JS syntax check"
-        fi
+          fi
+        done
         
     - name: Check CSS syntax
       run: |
@@ -65,17 +70,27 @@ jobs:
     - name: Check JSON validity
       run: |
         echo "Checking JSON files for validity..."
+        json_files_found=false
         for file in $(find . -name "*.json" -not -path "./node_modules/*"); do
           if [ -f "$file" ]; then
+            json_files_found=true
             echo "Checking $file..."
-            if command -v python3 >/dev/null 2>&1; then
-              python3 -m json.tool "$file" > /dev/null || exit 1
+            if python3 -m json.tool "$file" > /dev/null 2>&1; then
               echo "✅ $file is valid JSON"
             else
-              echo "Python3 not available, skipping JSON validation"
+              echo "❌ $file has JSON syntax errors"
+              echo "Error details:"
+              python3 -m json.tool "$file" 2>&1 || true
+              exit 1
             fi
           fi
         done
+        
+        if [ "$json_files_found" = false ]; then
+          echo "ℹ️  No JSON files found to validate"
+        else
+          echo "✅ All JSON files are valid"
+        fi
 
   file-structure-check:
     name: File Structure Check  
