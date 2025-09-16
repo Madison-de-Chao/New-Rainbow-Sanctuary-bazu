@@ -37,18 +37,24 @@ jobs:
           fi
         done
         
-        # JavaScript syntax validation
-        echo "Checking JavaScript syntax..."
-        for file in js/*.js; do
-          if [ -f "$file" ]; then
-            if node -c "$file"; then
-              echo "✅ $file syntax is valid"
-            else
-              echo "❌ $file has syntax errors"
-              exit 1
+        # JavaScript syntax validation using comprehensive checker
+        echo "Running comprehensive JavaScript syntax validation..."
+        if [ -f "scripts/check-js-syntax.js" ]; then
+          node scripts/check-js-syntax.js
+        else
+          # Fallback to basic validation
+          echo "Checking JavaScript syntax..."
+          for file in js/*.js; do
+            if [ -f "$file" ]; then
+              if node -c "$file"; then
+                echo "✅ $file syntax is valid"
+              else
+                echo "❌ $file has syntax errors"
+                exit 1
+              fi
             fi
-          fi
-        done
+          done
+        fi
         
         # JSON validation
         echo "Checking JSON files..."
