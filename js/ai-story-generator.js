@@ -73,43 +73,46 @@ class AIStoryGenerator {
 
   // 構建AI提示詞
   buildAIPrompt(pillarData, tone) {
-    const { position, gan, zhi, naYin } = pillarData;
+  const { position, gan, zhi, naYin } = pillarData;
 
-    const tonePrompts = {
-      default: "以神話傳說的語調，充滿想像力和詩意",
-      military: "以軍事戰略的語調，展現戰術智慧和領導力",
-      healing: "以溫暖療癒的語調，帶來安慰和希望",
-      poetic: "以詩意優雅的語調，富有文學美感",
-      mythic: "以神秘玄幻的語調，充滿超自然色彩"
-    };
+  const tonePrompts = {
+    default: "以神話傳說的語調，充滿想像力和詩意",
+    military: "以軍事戰略的語調，展現戰術智慧和領導力",
+    healing: "以溫暖療癒的語調，帶來安慰和希望",
+    poetic: "以詩意優雅的語調，富有文學美感",
+    mythic: "以神秘玄幻的語調，充滿超自然色彩"
+  };
 
-    const pillarDomains = {
-      年: "家族傳承與童年根基",
-      月: "社會關係與事業發展",
-      日: "核心自我與婚姻愛情",
-      時: "未來展望與子女運勢"
-    };
+  const pillarDomains = {
+    "年": "家族傳承與童年根基",
+    "月": "社會關係與事業發展",
+    "日": "核心自我與婚姻愛情",
+    "時": "未來展望與子女運勢"
+  };
 
-    return `請為八字命理中的${position}柱創作一個恰好150字的個性化軍團故事。
+  const lines = [
+    "請為八字命理中的" + position + "柱創作一個恰好150字的個性化軍團故事。",
+    "",
+    "背景資訊：",
+    "- 柱位：" + position + "柱（主管" + pillarDomains[position] + "）",
+    "- 干支：" + gan + zhi,
+    "- 納音：" + naYin,
+    "- 五行屬性：" + this.getElementInfo(gan, zhi),
+    "",
+    "創作要求：",
+    "1. 字數恰好150字（中文字符）",
+    "2. " + (tonePrompts[tone] || tonePrompts.default),
+    "3. 以軍團、將軍、軍師的概念來描述",
+    "4. 融入" + gan + "天干和" + zhi + "地支的特質",
+    "5. 體現" + naYin + "納音的意義",
+    "6. 反映" + position + "柱在人生中的作用",
+    "7. 具有啟發性和指導意義",
+    "",
+    "請直接返回150字的故事內容，不要任何額外說明。"
+  ];
 
-背景資訊：
-- 柱位：${position}柱（主管${pillarDomains[position]}）
-- 干支：${gan}${zhi}
-- 納音：${naYin}
-- 五行屬性：${this.getElementInfo(gan, zhi)}
-
-創作要求：
-1. 字數恰好150字（中文字符）
-2. ${tonePrompts[tone] || tonePrompts.default}
-3. 以軍團、將軍、軍師的概念來描述
-4. 融入${gan}天干和${zhi}地支的特質
-5. 體現${naYin}納音的意義
-6. 反映${position}柱在人生中的作用
-7. 具有啟發性和指導意義
-
-請直接返回150字的故事內容，不要任何額外說明。`;
-  }
-
+  return lines.join("\n");
+}
   // OpenAI API調用（保守版）
 async callOpenAI(service, prompt) {
   const payload = {
