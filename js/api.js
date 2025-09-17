@@ -35,16 +35,42 @@ async function calculateBaziFromDatabase(birthData) {
 
 // 新增：從資料庫獲取完整八字分析
 async function getFullBaziAnalysis(birthData, tone = "default") {
-  try {
-    const baziResult = await calculateBaziFromDatabase(birthData);
-    
-    // 轉換後端數據格式為前端期望的格式
-    const analysisData = convertBackendToFrontend(baziResult.data, tone);
-    return analysisData;
-  } catch (error) {
-    console.warn("資料庫API暫時無法使用，使用演示數據：", error);
-    return getDemoAnalysis(birthData, tone);
+  // 添加重試機制
+  const maxRetries = 2;
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const baziResult = await calculateBaziFromDatabase(birthData);
+      
+      // 轉換後端數據格式為前端期望的格式
+      const analysisData = convertBackendToFrontend(baziResult.data, tone);
+      
+      // 成功時通知用戶使用了線上數據
+      if (window.showApiStatus) {
+        window.showApiStatus("✨ 已連接雲端資料庫，使用最新八字演算法", "success");
+      }
+      
+      return analysisData;
+    } catch (error) {
+      lastError = error;
+      console.warn(`API 嘗試 ${attempt}/${maxRetries} 失敗:`, error.message);
+      
+      // 如果不是最後一次嘗試，等待後重試
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
   }
+  
+  // 所有重試都失敗後，使用演示數據並友善通知用戶
+  console.warn("資料庫API暫時無法使用，使用本地演示數據：", lastError);
+  
+  if (window.showApiStatus) {
+    window.showApiStatus("🔮 目前使用本地八字資料庫，功能完整可用", "warning");
+  }
+  
+  return getDemoAnalysis(birthData, tone);
 }
 
 // 轉換後端API數據格式為前端期望的格式
@@ -335,6 +361,104 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+// 輸入驗證函數
+function validateBirthInput(year, month, day, hour) {
+  const currentYear = new Date().getFullYear();
+  
+  if (!year || isNaN(year)) {
+    return "請選擇出生年份 🗓️";
+  }
+  
+  if (year < 1900 || year > currentYear) {
+    return `出生年份應在 1900 年至 ${currentYear} 年之間 📅`;
+  }
+  
+  if (!month || isNaN(month) || month < 1 || month > 12) {
+    return "請選擇正確的出生月份 🌙";
+  }
+  
+  if (!day || isNaN(day) || day < 1 || day > 31) {
+    return "請選擇正確的出生日期 📍";
+  }
+  
+  // 檢查日期是否有效
+  const testDate = new Date(year, month - 1, day);
+  if (testDate.getFullYear() !== year || testDate.getMonth() !== month - 1 || testDate.getDate() !== day) {
+    return "此日期不存在，請檢查年月日是否正確 ❌";
+  }
+  
+  if (isNaN(hour) || hour < 0 || hour > 23) {
+    return "請選擇出生時辰 🕐";
+  }
+  
+  return null; // 無錯誤
+}
+
+// 友善的錯誤提示函數
+function showFriendlyError(message) {
+  // 嘗試使用更好的通知方式，如果不存在則使用 alert
+  if (window.showApiStatus) {
+    window.showApiStatus(message, "error");
+  } else {
+    alert(message);
+  }
+}
+
+// 將驗證函數暴露到全域範圍
+window.validateBirthInput = validateBirthInput;
+window.showFriendlyError = showFriendlyError;
+
+// 顯示API狀態的全域函數
+window.showApiStatus = function(message, type = "info") {
+  // 如果存在狀態容器，使用它；否則創建一個
+  let statusContainer = document.getElementById("api-status");
+  if (!statusContainer) {
+    statusContainer = document.createElement("div");
+    statusContainer.id = "api-status";
+    statusContainer.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      max-width: 300px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    `;
+    document.body.appendChild(statusContainer);
+  }
+  
+  // 根據類型設置樣式
+  const styles = {
+    success: { background: "#e8f5e8", color: "#2d5a2d", border: "1px solid #4caf50" },
+    warning: { background: "#fff3cd", color: "#856404", border: "1px solid #ffc107" },
+    error: { background: "#f8d7da", color: "#721c24", border: "1px solid #dc3545" },
+    info: { background: "#d1ecf1", color: "#0c5460", border: "1px solid #17a2b8" }
+  };
+  
+  const style = styles[type] || styles.info;
+  statusContainer.style.background = style.background;
+  statusContainer.style.color = style.color;
+  statusContainer.style.border = style.border;
+  statusContainer.textContent = message;
+  
+  // 自動隱藏（除了錯誤訊息）
+  if (type !== "error") {
+    setTimeout(() => {
+      if (statusContainer.parentNode) {
+        statusContainer.style.opacity = "0";
+        setTimeout(() => {
+          if (statusContainer.parentNode) {
+            statusContainer.parentNode.removeChild(statusContainer);
+          }
+        }, 300);
+      }
+    }, 4000);
+  }
+};
+
 // 主召喚函式 - 使用資料庫計算
 async function enterSite() {
   const toneElement = document.getElementById("tone");
@@ -355,8 +479,10 @@ async function enterSite() {
   const d = parseInt(dayElement.value);
   const h = parseInt(hourElement.value);
 
-  if (!y || !m || !d || isNaN(h)) {
-    alert("請完整輸入出生年月日時");
+  // 詳細的輸入驗證
+  const validationError = validateBirthInput(y, m, d, h);
+  if (validationError) {
+    showFriendlyError(validationError);
     return;
   }
 
@@ -387,7 +513,7 @@ async function enterSite() {
     
   } catch (err) {
     console.error("API 錯誤", err);
-    alert("召喚失敗，請稍後再試: " + err.message);
+    showFriendlyError("召喚過程遇到問題，請稍後再試 🔮");
     document.querySelector(".enter-btn").innerText = "開始召喚你的軍團";
     document.querySelector(".enter-btn").disabled = false;
   }
