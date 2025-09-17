@@ -31,7 +31,7 @@ class AIStoryGenerator {
   };
 
   // 生成150字豐富故事 - 主入口
-  async generateRichStory(pillarData, tone = 'default')
+  async generateRichStory(pillarData, tone = 'default') {
     const { position, gan, zhi, naYin } = pillarData;
     
     // 嘗試使用AI服務
