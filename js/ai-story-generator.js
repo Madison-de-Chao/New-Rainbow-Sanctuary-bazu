@@ -17,8 +17,7 @@ class AIStoryGenerator {
         enabled: true, // 本地生成始終可用
         advanced: true
       }
-    }
-    
+    };
     this.currentService = 'local'; // 默認使用本地生成
   }
 
@@ -28,12 +27,12 @@ class AIStoryGenerator {
       this.aiServices[service].apiKey = apiKey;
       this.currentService = service;
     }
-  };
+  }
 
   // 生成150字豐富故事 - 主入口
   async generateRichStory(pillarData, tone = 'default') {
     const { position, gan, zhi, naYin } = pillarData;
-    
+
     // 嘗試使用AI服務
     try {
       if (this.currentService !== 'local' && this.aiServices[this.currentService].apiKey) {
@@ -60,14 +59,14 @@ class AIStoryGenerator {
     } else if (this.currentService === 'claude') {
       return await this.callClaude(service, prompt);
     }
-    
+
     return null;
   }
 
   // 構建AI提示詞
   buildAIPrompt(pillarData, tone) {
     const { position, gan, zhi, naYin } = pillarData;
-    
+
     const tonePrompts = {
       default: '以神話傳說的語調，充滿想像力和詩意',
       military: '以軍事戰略的語調，展現戰術智慧和領導力',
@@ -120,7 +119,7 @@ class AIStoryGenerator {
     });
 
     if (!response.ok) throw new Error(`OpenAI API錯誤: ${response.status}`);
-    
+
     const data = await response.json();
     return data.choices[0]?.message?.content?.trim();
   }
@@ -142,7 +141,7 @@ class AIStoryGenerator {
     });
 
     if (!response.ok) throw new Error(`Claude API錯誤: ${response.status}`);
-    
+
     const data = await response.json();
     return data.content[0]?.text?.trim();
   }
@@ -150,16 +149,16 @@ class AIStoryGenerator {
   // 增強版本地故事生成
   generateAdvancedLocalStory(pillarData, tone = 'default') {
     const { position, gan, zhi, naYin } = pillarData;
-    
+
     // 獲取詳細的元素信息
     const ganInfo = this.getGanDetails(gan);
     const zhiInfo = this.getZhiDetails(zhi);
     const nayinInfo = this.getNayinDetails(naYin);
     const toneStyle = this.getToneStyle(tone);
-    
+
     // 根據柱位選擇故事模板
     const storyTemplate = this.getStoryTemplate(position);
-    
+
     // 生成個性化故事
     return this.buildPersonalizedStory({
       position,
@@ -176,7 +175,7 @@ class AIStoryGenerator {
       '乙': { name: '乙木謀士', element: '木', nature: '陰', desc: '如柔韌花草般適應環境', trait: '柔韌智慧', power: '靈活變通' },
       '丙': { name: '丙火戰神', element: '火', nature: '陽', desc: '如烈日般光芒萬丈', trait: '熱情積極', power: '照亮前路' },
       '丁': { name: '丁火法師', element: '火', nature: '陰', desc: '如燭光般溫暖人心', trait: '細膩溫和', power: '啟發智慧' },
-      '戊': { name: '戊土守衛', element: '土', nature: '陽', desc: '如高山般穩固可靠', trait: '包容穩重', power: '承載萬物' },
+      '戊': { name: '戊土守衛', element: '土', nature: '陽', desc: '如高山般穩固可靠', trait: '包容夠穩', power: '承載萬物' },
       '己': { name: '己土後勤', element: '土', nature: '陰', desc: '如沃土般滋養生命', trait: '細心謹慎', power: '培育成長' },
       '庚': { name: '庚金騎士', element: '金', nature: '陽', desc: '如利劍般銳利果決', trait: '剛毅決斷', power: '破除障礙' },
       '辛': { name: '辛金刺客', element: '金', nature: '陰', desc: '如珠寶般精緻優雅', trait: '精準靈巧', power: '精工細作' },
@@ -219,7 +218,7 @@ class AIStoryGenerator {
       '白臘金': { power: '溫潤優雅', quality: '精緻品格', nature: '內外兼修', effect: '提升品味' },
       '楊柳木': { power: '柔韌適應', quality: '生命力強', nature: '隨遇而安', effect: '春風化雨' }
     };
-    
+
     // 如果納音不在列表中，生成通用描述
     if (!nayinMeanings[nayin]) {
       const elements = ['金', '木', '水', '火', '土'];
@@ -231,7 +230,7 @@ class AIStoryGenerator {
         effect: '命運加持'
       };
     }
-    
+
     return nayinMeanings[nayin];
   }
 
@@ -242,7 +241,7 @@ class AIStoryGenerator {
       military: { prefix: '在人生的戰場上', style: '軍事策略', ending: '制定著勝利的戰略' },
       healing: { prefix: '在溫暖的光芒中', style: '療癒溫暖', ending: '帶來內心的平靜' },
       poetic: { prefix: '在詩意的時光裡', style: '優雅詩意', ending: '吟唱著生命的詩篇' },
-      mythic: { prefix: '在古老的傳說中', style: '神秘玄幻', ending: '守護著永恆的秘密' }
+      mythic: { prefix: '在古老的傳說中', style: '神秘玄幻', ending: '守護著永恒的秘密' }
     };
     return toneStyles[tone] || toneStyles.default;
   }
@@ -250,30 +249,10 @@ class AIStoryGenerator {
   // 獲取故事模板
   getStoryTemplate(position) {
     const templates = {
-      '年': {
-        domain: '生命根源',
-        role: '祖源守護',
-        mission: '奠定根基',
-        influence: '家族傳承與童年印記'
-      },
-      '月': {
-        domain: '社會關係',
-        role: '外交統領',
-        mission: '建立聯盟',
-        influence: '事業發展與人際網絡'
-      },
-      '日': {
-        domain: '核心本質',
-        role: '主帥統帥',
-        mission: '領導全局',
-        influence: '個人特質與愛情婚姻'
-      },
-      '時': {
-        domain: '未來展望',
-        role: '前瞻先鋒',
-        mission: '開創未來',
-        influence: '創造力與子女運勢'
-      }
+      '年': { domain: '生命根源', role: '祖源守護', mission: '奠定根基', influence: '家族傳承與童年印記' },
+      '月': { domain: '社會關係', role: '外交統領', mission: '建立聯盟', influence: '事業發展與人際網絡' },
+      '日': { domain: '核心本質', role: '主帥統帥', mission: '領導全局', influence: '個人特質與愛情婚姻' },
+      '時': { domain: '未來展望', role: '前瞻先鋒', mission: '開創未來', influence: '創造力與子女運勢' }
     };
     return templates[position] || templates['日'];
   }
@@ -281,10 +260,10 @@ class AIStoryGenerator {
   // 構建個性化故事
   buildPersonalizedStory(params) {
     const { position, gan, zhi, naYin, ganInfo, zhiInfo, nayinInfo, toneStyle, storyTemplate } = params;
-    
+
     // 構建150字故事，確保內容豐富且有深度
     const story = `${toneStyle.prefix}，${ganInfo.name}統領著${position}柱${storyTemplate.domain}軍團。這支由${gan}${zhi}組建的精英部隊，承載著${naYin}的${nayinInfo.power}能量。${ganInfo.desc}的主將，以其${ganInfo.trait}特質${storyTemplate.mission}，${zhiInfo.name}擔任${storyTemplate.role}，運用${zhiInfo.wisdom}的智慧指導戰略。${nayinInfo.nature}的軍團氣質體現著${nayinInfo.quality}，在${storyTemplate.influence}領域發揮關鍵作用。透過${ganInfo.power}與${zhiInfo.trait}的完美結合，這支軍團${nayinInfo.effect}，為你的人生${toneStyle.ending}，引領你在${position === '年' ? '根基建立' : position === '月' ? '社會發展' : position === '日' ? '自我實現' : '未來創造'}的道路上勇敢前行。`;
-    
+
     return story;
   }
 
@@ -295,13 +274,13 @@ class AIStoryGenerator {
       '戊': '陽土', '己': '陰土', '庚': '陽金', '辛': '陰金',
       '壬': '陽水', '癸': '陰水'
     };
-    
+
     const zhiElements = {
       '子': '陽水', '丑': '陰土', '寅': '陽木', '卯': '陰木',
       '辰': '陽土', '巳': '陰火', '午': '陽火', '未': '陰土',
       '申': '陽金', '酉': '陰金', '戌': '陽土', '亥': '陰水'
     };
-    
+
     return `天干${ganElements[gan]}，地支${zhiElements[zhi]}`;
   }
 
@@ -320,18 +299,13 @@ class AIStoryGenerator {
   getDefaultRichStory(pillarData, tone) {
     const stories = {
       年: `在你的生命源頭，${pillarData.gan}${pillarData.zhi}守護者如古老的神殿般庇護著家族的根基。作為祖源軍團的統帥，他承載著世代傳承的智慧與力量。${pillarData.naYin}的光輝從他身上散發，象徵著你與生俱來的潛能和家族的榮耀。這位守護者見證了你的第一聲啼哭，記錄著童年的每一個成長足跡。他的存在讓你明白，無論走到哪裡，都有著深厚的根基支撐。在人生的風雨中，他是你最堅實的後盾，提醒你永遠不要忘記來時的路。`,
-      
       月: `在社會的舞台上，${pillarData.gan}${pillarData.zhi}守護者如智慧的外交官般穿梭於人際關係中。作為關係軍團的領袖，他精通各種社交藝術，深諳合作之道。${pillarData.naYin}的能量賦予他獨特的魅力，讓你在事業發展中如魚得水。這位守護者幫助你建立重要的人脈網絡，在關鍵時刻總能遇到貴人相助。他教會你如何在競爭中保持優雅，在合作中展現實力。透過他的指引，你學會了平衡個人目標與團隊利益，在職場上建立起良好的聲譽和持久的夥伴關係。`,
-      
       日: `在你的核心本質中，${pillarData.gan}${pillarData.zhi}守護者如永恆的明燈般照亮內心深處。作為核心軍團的主帥，他代表著你最真實的自我和內在的智慧。${pillarData.naYin}的光輝從他身上散發，象徵著你獨特的個性和不可替代的價值。這位守護者了解你的每一個想法，支持你的每一個決定，是你最忠實的夥伴。他教會你如何愛自己，也如何去愛別人。在感情的路上，他是你最好的顧問，幫助你找到那個真正懂你、愛你的人，共同創造美好的未來。`,
-      
       時: `在未來的地平線上，${pillarData.gan}${pillarData.zhi}守護者如先知般預見著美好的明天。作為未來軍團的先鋒，他擁有無限的創造力和前瞻的眼光。${pillarData.naYin}的力量讓他能夠將夢想化為現實，為你開闢全新的道路。這位守護者不僅關注你個人的成就，更關心你能為世界帶來什麼改變。他引導你發揮天賦才能，在創作、創新或教育子女方面展現出色的能力。透過他的啟發，你明白了生命的意義不僅在於個人的成功，更在於能夠將智慧和愛傳遞給下一代，讓美好延續。`
     };
-    
+
     return stories[pillarData.position] || stories.日;
   }
-
-
 
   // 設置API密鑰
   setApiKey(apiKey) {
@@ -346,4 +320,3 @@ window.aiStoryGenerator = new AIStoryGenerator();
 if (typeof OPENAI_API_KEY !== 'undefined') {
   window.aiStoryGenerator.setApiKey(OPENAI_API_KEY);
 }
-
