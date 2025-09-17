@@ -110,29 +110,33 @@ class AIStoryGenerator {
 請直接返回150字的故事內容，不要任何額外說明。`;
   }
 
-  // OpenAI API調用（前端示意；建議改為呼叫後端代理 /api/ai-proxy）
-  async callOpenAI(service, prompt) {
-    const payload = {
-      model: service.model,
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 300,
-      temperature: 0.8
-    };
+  // OpenAI API調用（保守版）
+async callOpenAI(service, prompt) {
+  const payload = {
+    model: service.model,
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 300,
+    temperature: 0.8
+  }; // ← 這個分號必須存在
 
-    const response = await fetch(service.baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${service.apiKey}`
-      },
-      body: JSON.stringify(payload)
-    });
+  const response = await fetch(service.baseUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${service.apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
 
-    if (!response.ok) throw new Error(`OpenAI API錯誤: ${response.status}`);
-
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim();
+  if (!response.ok) {
+    throw new Error(`OpenAI API錯誤: ${response.status}`);
   }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content?.trim();
+}
+
+   
 
   // Claude API調用（前端示意；建議改為呼叫後端代理 /api/ai-proxy）
   async callClaude(service, prompt) {
