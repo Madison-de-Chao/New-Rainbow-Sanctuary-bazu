@@ -105,7 +105,11 @@ async function processStoredData() {
 
       } catch (error) {
         console.error('Error:', error);
-        alert('計算失敗，請稍後再試');
+        if (window.showFriendlyError) {
+          window.showFriendlyError('計算過程遇到問題，請稍後再試 🔮');
+        } else {
+          alert('計算失敗，請稍後再試');
+        }
       }
 
       hideLoadingAnimation();
@@ -192,7 +196,11 @@ async function processStoredData() {
         console.error("Error processing birth data:", error);
         // Show error and allow user to try again
         hideLoadingScreen();
-        showErrorMessage("計算失敗，請返回重新輸入");
+        if (window.showFriendlyError) {
+          window.showFriendlyError("計算失敗，請返回重新輸入 🔄");
+        } else {
+          showErrorMessage("計算失敗，請返回重新輸入");
+        }
       }
     } else {
       hideLoadingScreen();
