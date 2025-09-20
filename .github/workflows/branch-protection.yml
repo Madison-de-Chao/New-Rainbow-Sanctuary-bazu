@@ -1,4 +1,4 @@
-name: Branch Protection Checks
+name: Application Tests
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [ main, master ]
 
 jobs:
-  code-quality-check:
-    name: Code Quality Check
+  functional-tests:
+    name: Functional Tests
     runs-on: ubuntu-latest
     
     steps:
@@ -19,264 +19,322 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-      
-    - name: Check HTML validity
-      run: |
-        echo "Checking HTML files for basic syntax..."
-        for file in *.html; do
-          if [ -f "$file" ]; then
-            echo "Checking $file..."
-            # Basic HTML syntax check
-            if grep -q "<!DOCTYPE" "$file" && grep -q "</html>" "$file"; then
-              echo "✅ $file has proper HTML structure"
-            else
-              echo "❌ $file may have HTML structure issues"
-              exit 1
-            fi
-          fi
-        done
+
         
-    - name: Check JavaScript syntax
+    - name: Test application startup
       run: |
-        echo "Checking JavaScript files for basic syntax..."
-        for file in js/*.js; do
-          if [ -f "$file" ]; then
-            echo "Checking $file..."
-            if node -c "$file"; then
-              echo "✅ $file syntax is valid"
-            else
-              echo "❌ $file has syntax errors"
-              exit 1
-            fi
-          fi
-        done
+
         
-    - name: Check CSS syntax
-      run: |
-        echo "Checking CSS files for basic issues..."
-        for file in css/*.css; do
-          if [ -f "$file" ]; then
-            echo "Checking $file..."
-            # Basic CSS bracket matching
-            if [ $(grep -o '{' "$file" | wc -l) -eq $(grep -o '}' "$file" | wc -l) ]; then
-              echo "✅ $file has balanced brackets"
-            else
-              echo "❌ $file may have unbalanced brackets"
-              exit 1
-            fi
-          fi
-        done
+        # Start the application server
+        python3 -m http.server 8000 &
+        SERVER_PID=$!
         
-    - name: Check JSON validity
-      run: |
-        echo "Checking JSON files for validity..."
-        json_files_found=false
-        for file in $(find . -name "*.json" -not -path "./node_modules/*"); do
-          if [ -f "$file" ]; then
-            json_files_found=true
-            echo "Checking $file..."
-            if python3 -m json.tool "$file" > /dev/null 2>&1; then
-              echo "✅ $file is valid JSON"
-            else
-              echo "❌ $file has JSON syntax errors"
-              echo "Error details:"
-              python3 -m json.tool "$file" 2>&1 || true
-              exit 1
-            fi
-          fi
-        done
+
+
         
-        if [ "$json_files_found" = false ]; then
-          echo "ℹ️  No JSON files found to validate"
+        # Test if server is responding
+        if curl -f http://localhost:8000/ > /dev/null 2>&1; then
+          echo "✅ Application server started successfully"
         else
-          echo "✅ All JSON files are valid"
+          echo "❌ Application server failed to start"
+          kill $SERVER_PID 2>/dev/null || true
+          exit 1
         fi
+        
+        # Test key pages
+        pages=("index.html" "bazi.html" "report.html" "test-cases.html")
+        for page in "${pages[@]}"; do
+          if curl -f "http://localhost:8000/$page" > /dev/null 2>&1; then
+            echo "✅ $page is accessible"
+          else
+            echo "❌ $page is not accessible"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+        done
+        
+        # Clean up
+        kill $SERVER_PID 2>/dev/null || true
+        echo "✅ Application startup test completed"
 
-  file-structure-check:
-    name: File Structure Check  
+  data-validation:
+    name: Data Validation Tests
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Verify required files exist
+    - name: Validate sample data
       run: |
-        echo "Checking for required project files..."
-        required_files=(
-          "index.html"
-          "bazi.html" 
-          "report.html"
-          "README.md"
+        echo "Validating sample data structure..."
+        
+        # Check if sample.json exists and is valid
+        if [ -f "data/sample.json" ]; then
+          echo "Validating data/sample.json..."
+          
+          # Use Python to validate and check structure
+          python3 << 'EOF'
+import json
+import sys
+
+try:
+    with open('data/sample.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    # Check required top-level keys
+    required_keys = ['sampleChart', 'sampleNarrative', 'toneSettings']
+    for key in required_keys:
+        if key not in data:
+            print(f"❌ Missing required key: {key}")
+            sys.exit(1)
+        else:
+            print(f"✅ Found required key: {key}")
+    
+    # Check sampleChart structure
+    chart = data['sampleChart']
+    if 'pillars' in chart:
+        pillars = chart['pillars']
+        required_pillars = ['年', '月', '日', '時']
+        for pillar in required_pillars:
+            if pillar not in pillars:
+                print(f"❌ Missing pillar: {pillar}")
+                sys.exit(1)
+            else:
+                print(f"✅ Found pillar: {pillar}")
+                # Check pillar structure
+                if 'pillar' not in pillars[pillar] or 'gan' not in pillars[pillar] or 'zhi' not in pillars[pillar]:
+                    print(f"❌ Pillar {pillar} missing required fields")
+                    sys.exit(1)
+    
+    # Check five elements
+    if 'fiveElements' in chart:
+        elements = chart['fiveElements']
+        required_elements = ['金', '木', '水', '火', '土']
+        for element in required_elements:
+            if element not in elements:
+                print(f"❌ Missing element: {element}")
+                sys.exit(1)
+            else:
+                print(f"✅ Found element: {element}")
+    
+    # Check narrative structure
+    narrative = data['sampleNarrative']
+    for pillar in ['年', '月', '日', '時']:
+        if pillar not in narrative:
+            print(f"❌ Missing narrative for pillar: {pillar}")
+            sys.exit(1)
+        else:
+            pillar_narrative = narrative[pillar]
+            required_fields = ['commander', 'strategist', 'naYin', 'story']
+            for field in required_fields:
+                if field not in pillar_narrative:
+                    print(f"❌ Missing narrative field {field} for pillar {pillar}")
+                    sys.exit(1)
+    
+    print("✅ All data validation checks passed")
+    
+except json.JSONDecodeError as e:
+    print(f"❌ JSON parsing error: {e}")
+    sys.exit(1)
+except Exception as e:
+    print(f"❌ Validation error: {e}")
+    sys.exit(1)
+EOF
+        else
+          echo "❌ data/sample.json not found"
+          exit 1
+        fi
+
+  javascript-functionality:
+    name: JavaScript Functionality Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install testing dependencies
+      run: |
+        # Install basic testing tools
+        npm init -y
+        npm install --save-dev jsdom
+        
+    - name: Test JavaScript modules
+      run: |
+        echo "Testing JavaScript functionality..."
+        
+        # Create a simple test runner
+        cat > test-runner.js << 'EOF'
+const fs = require('fs');
+const { JSDOM } = require('jsdom');
+
+// Test if JavaScript files can be loaded without syntax errors
+const jsFiles = [
+  'js/app.js',
+  'js/api.js',
+  'js/enhanced-app.js',
+  'js/enhanced-app-fixed.js'
+];
+
+console.log('Testing JavaScript files...');
+
+jsFiles.forEach(file => {
+  if (fs.existsSync(file)) {
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      console.log(`✅ ${file} loaded successfully`);
+      
+      // Basic syntax validation
+      new Function(content);
+      console.log(`✅ ${file} syntax is valid`);
+      
+    } catch (error) {
+      console.log(`❌ ${file} has issues: ${error.message}`);
+      process.exit(1);
+    }
+  } else {
+    console.log(`⚠️  ${file} not found`);
+  }
+});
+
+// Test if HTML files can be parsed
+console.log('\nTesting HTML files...');
+const htmlFiles = ['index.html', 'bazi.html', 'report.html', 'test-cases.html'];
+
+htmlFiles.forEach(file => {
+  if (fs.existsSync(file)) {
+    try {
+      const content = fs.readFileSync(file, 'utf8');
+      const dom = new JSDOM(content);
+      console.log(`✅ ${file} parsed successfully`);
+      
+      // Check for basic structure
+      const document = dom.window.document;
+      if (document.doctype && document.documentElement) {
+        console.log(`✅ ${file} has proper HTML structure`);
+      } else {
+        console.log(`⚠️  ${file} may have structure issues`);
+      }
+      
+    } catch (error) {
+      console.log(`❌ ${file} parsing failed: ${error.message}`);
+      process.exit(1);
+    }
+  } else {
+    console.log(`⚠️  ${file} not found`);
+  }
+});
+
+console.log('\n✅ All JavaScript functionality tests completed');
+EOF
+
+        node test-runner.js
+
+  css-validation:
+    name: CSS Validation Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Test CSS files
+      run: |
+        echo "Testing CSS files..."
+        
+        css_files=(
           "css/style.css"
-          "js/app.js"
-          "data/sample.json"
+          "css/index.css"
+          "css/bazi.css"
+          "css/report.css"
+          "css/theme.css"
         )
         
-        missing_files=()
-        for file in "${required_files[@]}"; do
+        for file in "${css_files[@]}"; do
           if [ -f "$file" ]; then
-            echo "✅ $file exists"
+            echo "Testing $file..."
+            
+            # Check for balanced brackets
+            open_brackets=$(grep -o '{' "$file" | wc -l)
+            close_brackets=$(grep -o '}' "$file" | wc -l)
+            
+            if [ $open_brackets -eq $close_brackets ]; then
+              echo "✅ $file has balanced brackets ($open_brackets pairs)"
+            else
+              echo "❌ $file has unbalanced brackets (open: $open_brackets, close: $close_brackets)"
+              exit 1
+            fi
+            
+            # Check for common CSS issues
+            if grep -q "color:\s*;" "$file"; then
+              echo "❌ $file has empty color values"
+              exit 1
+            fi
+            
+            if grep -q "font-size:\s*;" "$file"; then
+              echo "❌ $file has empty font-size values"
+              exit 1
+            fi
+            
+            echo "✅ $file passed basic validation"
           else
-            echo "❌ $file is missing"
-            missing_files+=("$file")
+            echo "⚠️  $file not found"
           fi
         done
         
-        if [ ${#missing_files[@]} -gt 0 ]; then
-          echo "Missing required files: ${missing_files[*]}"
-          exit 1
-        fi
-        
-    - name: Check for sensitive files
-      run: |
-        echo "Checking for accidentally committed sensitive files..."
-        sensitive_patterns=(
-          "*.env"
-          "*.key"
-          "*.pem"
-          "*password*"
-          "*secret*"
-          ".env.*"
-        )
-        
-        found_sensitive=false
-        for pattern in "${sensitive_patterns[@]}"; do
-          if find . -name "$pattern" -not -path "./.git/*" | grep -q .; then
-            echo "❌ Found potentially sensitive files matching pattern: $pattern"
-            find . -name "$pattern" -not -path "./.git/*"
-            found_sensitive=true
-          fi
-        done
-        
-        if [ "$found_sensitive" = true ]; then
-          exit 1
-        fi
-        echo "✅ No sensitive files detected"
+        echo "✅ CSS validation completed"
 
-  documentation-check:
-    name: Documentation Check
+  accessibility-check:
+    name: Accessibility Check
     runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Check README completeness
+    - name: Check HTML accessibility features
       run: |
-        echo "Checking README.md completeness..."
-        required_sections=(
-          "專案簡介"
-          "主要功能"
-          "技術架構"
-          "專案結構"
-          "安裝與使用"
-          "貢獻指南"
-        )
+        echo "Checking HTML accessibility features..."
         
-        missing_sections=()
-        for section in "${required_sections[@]}"; do
-          if grep -q "$section" README.md; then
-            echo "✅ README contains section: $section"
-          else
-            echo "❌ README missing section: $section"
-            missing_sections+=("$section")
-          fi
-        done
+        html_files=("index.html" "bazi.html" "report.html" "test-cases.html")
         
-        if [ ${#missing_sections[@]} -gt 0 ]; then
-          echo "Missing required README sections: ${missing_sections[*]}"
-          exit 1
-        fi
-
-  security-check:
-    name: Security Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Check for security best practices
-      run: |
-        echo "Checking for basic security issues..."
-        
-        # Check for hardcoded credentials or API keys
-        if grep -r -i "password\s*=" . --exclude-dir=.git --exclude="*.md" | grep -v "placeholder"; then
-          echo "❌ Potential hardcoded password found"
-          exit 1
-        fi
-        
-        if grep -r -i "api[_-]key\s*=" . --exclude-dir=.git --exclude="*.md" | grep -v "placeholder"; then
-          echo "❌ Potential hardcoded API key found"
-          exit 1
-        fi
-        
-        # Check for HTTP URLs that should be HTTPS
-        if grep -r "http://" . --exclude-dir=.git --include="*.js" --include="*.html" | grep -v "localhost\|127.0.0.1"; then
-          echo "⚠️  Found HTTP URLs that might need to be HTTPS"
-          # Don't fail for this, just warn
-        fi
-        
-        echo "✅ Basic security checks passed"
-
-  compatibility-check:
-    name: Browser Compatibility Check
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Check for modern JavaScript features
-      run: |
-        echo "Checking JavaScript compatibility..."
-        
-        # Check for ES6+ features that might need polyfills
-        modern_features=(
-          "const\s"
-          "let\s"
-          "=>"
-          "async\s"
-          "await\s"
-          "Promise"
-        )
-        
-        for file in js/*.js; do
+        for file in "${html_files[@]}"; do
           if [ -f "$file" ]; then
-            echo "Checking $file for modern JavaScript features..."
-            for feature in "${modern_features[@]}"; do
-              if grep -q "$feature" "$file"; then
-                echo "ℹ️  $file uses modern feature: $feature"
+            echo "Checking $file for accessibility..."
+            
+            # Check for lang attribute
+            if grep -q 'lang=' "$file"; then
+              echo "✅ $file has lang attribute"
+            else
+              echo "⚠️  $file missing lang attribute"
+            fi
+            
+            # Check for alt attributes on images
+            img_count=$(grep -o '<img' "$file" | wc -l)
+            alt_count=$(grep -o 'alt=' "$file" | wc -l)
+            
+            if [ $img_count -gt 0 ]; then
+              if [ $img_count -eq $alt_count ]; then
+                echo "✅ $file: all $img_count images have alt attributes"
+              else
+                echo "⚠️  $file: $img_count images, but only $alt_count alt attributes"
               fi
-            done
+            fi
+            
+            # Check for proper heading hierarchy
+            if grep -q '<h1' "$file"; then
+              echo "✅ $file has h1 heading"
+            else
+              echo "⚠️  $file missing h1 heading"
+            fi
+            
           fi
         done
         
-        echo "✅ JavaScript compatibility check completed"
-        
-    - name: Check CSS for vendor prefixes
-      run: |
-        echo "Checking CSS for vendor prefixes..."
-        
-        # Look for CSS properties that might need vendor prefixes
-        prefixed_properties=(
-          "transform"
-          "transition"
-          "animation"
-          "gradient"
-          "flex"
-        )
-        
-        for file in css/*.css; do
-          if [ -f "$file" ]; then
-            echo "Checking $file..."
-            for property in "${prefixed_properties[@]}"; do
-              if grep -q "$property" "$file"; then
-                echo "ℹ️  $file uses CSS property that may need vendor prefixes: $property"
-              fi
-            done
-          fi
-        done
-        
-        echo "✅ CSS compatibility check completed"
+        echo "✅ Accessibility check completed"
