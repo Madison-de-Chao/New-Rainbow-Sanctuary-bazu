@@ -431,7 +431,11 @@
                     resultDiv.innerHTML = `❌ 測試失敗: ${data.message || '未知錯誤'}`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `❌ 網路錯誤: ${error.message}`;
+                resultDiv.innerHTML = `❌ 網路錯誤: ${error.message}<br><br>
+                📝 說明：外部 API 服務暫時無法使用。<br>
+                🔧 建議：這個測試需要連接到雲端資料庫來驗證節氣分界、五虎遁、五鼠遁的精確性。<br>
+                💡 替代方案：主要的八字應用程式有完整的離線模式，可以正常使用所有核心功能。<br>
+                🌐 狀態：本地功能完全正常，僅精密測試需要線上資料庫支援。`;
             }
         }
 

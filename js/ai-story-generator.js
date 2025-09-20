@@ -1,4 +1,26 @@
-buildAIPrompt(pillarData, tone) {
+// 簡單的天干地支五行對應表
+function getElementInfo(gan, zhi) {
+  const ganElements = {
+    "甲": "木", "乙": "木",
+    "丙": "火", "丁": "火", 
+    "戊": "土", "己": "土",
+    "庚": "金", "辛": "金",
+    "壬": "水", "癸": "水"
+  };
+  
+  const zhiElements = {
+    "子": "水", "丑": "土", "寅": "木", "卯": "木",
+    "辰": "土", "巳": "火", "午": "火", "未": "土",
+    "申": "金", "酉": "金", "戌": "土", "亥": "水"
+  };
+  
+  const ganElement = ganElements[gan] || "未知";
+  const zhiElement = zhiElements[zhi] || "未知";
+  
+  return `天干${gan}(${ganElement})，地支${zhi}(${zhiElement})`;
+}
+
+function buildAIPrompt(pillarData, tone) {
   const { position, gan, zhi, naYin } = pillarData;
 
   const tonePrompts = {
@@ -23,7 +45,7 @@ buildAIPrompt(pillarData, tone) {
     "- 柱位：" + position + "柱（主管" + pillarDomains[position] + "）",
     "- 干支：" + gan + zhi,
     "- 納音：" + naYin,
-    "- 五行屬性：" + this.getElementInfo(gan, zhi),
+    "- 五行屬性：" + getElementInfo(gan, zhi),
     "",
     "創作要求：",
     "1. 字數恰好150字（中文字符）",
