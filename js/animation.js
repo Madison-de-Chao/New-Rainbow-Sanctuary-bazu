@@ -30,15 +30,24 @@ function enterSite() {
   const tone = document.getElementById("tone").value
   const userName = document.getElementById("user-name").value
   const gender = document.getElementById("gender").value
-  const year = document.getElementById("birth-year").value
-  const month = document.getElementById("birth-month").value
-  const day = document.getElementById("birth-day").value
-  const hour = document.getElementById("birth-hour").value
+  const year = parseInt(document.getElementById("birth-year").value)
+  const month = parseInt(document.getElementById("birth-month").value)
+  const day = parseInt(document.getElementById("birth-day").value)
+  const hour = parseInt(document.getElementById("birth-hour").value)
 
-  // 檢查是否所有必要資料都已填寫
-  if (!year || !month || !day || !hour) {
-    alert("請完整填寫出生資料")
-    return
+  // 使用改進的驗證函數（如果可用）
+  if (window.validateBirthInput && window.showFriendlyError) {
+    const validationError = window.validateBirthInput(year, month, day, hour);
+    if (validationError) {
+      window.showFriendlyError(validationError);
+      return;
+    }
+  } else {
+    // 簡化的備用驗證
+    if (!year || !month || !day || isNaN(hour)) {
+      alert("請完整填寫出生資料 🗓️")
+      return
+    }
   }
 
   // 保存所有資料到 localStorage
@@ -47,10 +56,10 @@ function enterSite() {
   localStorage.setItem("birthData", JSON.stringify({
     userName: userName || "",
     gender: gender || "",
-    year: parseInt(year),
-    month: parseInt(month),
-    day: parseInt(day),
-    hour: parseInt(hour)
+    year: year,
+    month: month,
+    day: day,
+    hour: hour
   }))
 
   window.location.href = "bazi.html"

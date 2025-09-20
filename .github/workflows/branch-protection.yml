@@ -19,17 +19,18 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+
         
     - name: Test application startup
       run: |
-        echo "Testing application startup..."
+
         
         # Start the application server
         python3 -m http.server 8000 &
         SERVER_PID=$!
         
-        # Wait for server to start
-        sleep 3
+
+
         
         # Test if server is responding
         if curl -f http://localhost:8000/ > /dev/null 2>&1; then
